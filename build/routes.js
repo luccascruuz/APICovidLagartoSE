@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const caseDayController_1 = __importDefault(require("./Controllers/caseDayController"));
 const router = (0, express_1.Router)();
+const path_url_post = process.env.PATH_URL_POST || '';
 router.get('/cases-day', caseDayController_1.default.index);
-router.post('/case-day', caseDayController_1.default.addCaseDay);
+router.post(path_url_post, caseDayController_1.default.addCaseDay);
 exports.default = router;

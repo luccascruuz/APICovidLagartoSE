@@ -1,6 +1,6 @@
 import express from 'express'
 import router from './routes'
-import connectDatabase from './database/database'
+import connectDatabase from './Database/database'
 import dotenv from 'dotenv'
 
 dotenv.config();
