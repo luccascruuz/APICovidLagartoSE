@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsnd --transpile-only --respawn --ignore-watch node_modules src/server.ts"
+    "dev": "tsnd --transpile-only --respawn --ignore-watch node_modules src/server.ts",
+    "start": "node src/server.ts"
   },
   "author": "",
   "license": "ISC",
