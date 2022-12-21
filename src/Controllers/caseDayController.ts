@@ -10,7 +10,7 @@ const CaseDay = {
     },
     async totalCasesAndDeaths(req: Request, res: Response) {
         const cases = await caseDayModel.findOne().sort({ date: -1 })
-        return res.status(200).json({ totalCases: cases?.total_cases, totalDeaths: cases?.deaths })
+        return res.status(200).json({ totalCases: cases?.total_cases, totalDeaths: cases?.deaths, date: cases?.date })
     },
     async lastSevenDays(req: Request, res: Response) {
         const lastCase = await caseDayModel.findOne().sort({ date: -1 })
