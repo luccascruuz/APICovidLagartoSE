@@ -24,7 +24,13 @@ const CaseDay = {
     totalCasesAndDeaths(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const cases = yield caseDayModel_1.default.findOne().sort({ date: -1 });
-            return res.status(200).json({ totalCases: cases === null || cases === void 0 ? void 0 : cases.total_cases, totalDeaths: cases === null || cases === void 0 ? void 0 : cases.deaths, date: cases === null || cases === void 0 ? void 0 : cases.date });
+            return res.status(200).json({
+                totalCases: cases === null || cases === void 0 ? void 0 : cases.total_cases,
+                totalDeaths: cases === null || cases === void 0 ? void 0 : cases.deaths,
+                casesToday: cases === null || cases === void 0 ? void 0 : cases.new_cases,
+                deathsToday: cases === null || cases === void 0 ? void 0 : cases.new_deaths,
+                date: cases === null || cases === void 0 ? void 0 : cases.date
+            });
         });
     },
     lastSevenDays(req, res) {
