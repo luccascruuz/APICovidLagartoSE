@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { format, subDays, addHours } from 'date-fns'
+import { format, subDays, addDays, addHours } from 'date-fns'
 import caseDayModel from '../Models/caseDayModel'
 
 const CaseDay = {
@@ -27,6 +27,36 @@ const CaseDay = {
 
         const cases = await caseDayModel.find({ date: { $gte: dateLastSevenDay, $lte: dateLastCase } })
         return res.status(200).json(cases)
+    },
+    async movingAverageOfCases(req: Request, res: Response) {
+        const lastCase = await caseDayModel.findOne().sort({ date: -1 })
+
+        const lastWeekNumber = lastCase?.week_number ?? 0
+
+        let movingAverage = []
+
+        for (let i = 16; i <= lastWeekNumber; i++) {
+            const cases = await caseDayModel.find({ week_number: i })
+
+            if (cases.length > 0) {
+
+                const somaCasos = cases.reduce(function (totalSum, caseDay) {
+                    const numberCaseDay = caseDay.new_cases ?? 0
+
+                    return totalSum + numberCaseDay
+                }, 0)
+
+                const objMovingAverage = {
+                    movingAverage: Math.round(somaCasos / cases.length),
+                    date: cases[cases.length - 1].date
+                }
+
+                movingAverage.push(objMovingAverage)
+            }
+        }
+
+        return res.status(200).json(movingAverage)
+
     },
     async addCaseDay(req: Request, res: Response) {
         const {

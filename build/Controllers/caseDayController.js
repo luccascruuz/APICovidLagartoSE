@@ -43,6 +43,30 @@ const CaseDay = {
             return res.status(200).json(cases);
         });
     },
+    movingAverageOfCases(req, res) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            const lastCase = yield caseDayModel_1.default.findOne().sort({ date: -1 });
+            const lastWeekNumber = (_a = lastCase === null || lastCase === void 0 ? void 0 : lastCase.week_number) !== null && _a !== void 0 ? _a : 0;
+            let movingAverage = [];
+            for (let i = 16; i <= lastWeekNumber; i++) {
+                const cases = yield caseDayModel_1.default.find({ week_number: i });
+                if (cases.length > 0) {
+                    const somaCasos = cases.reduce(function (totalSum, caseDay) {
+                        var _a;
+                        const numberCaseDay = (_a = caseDay.new_cases) !== null && _a !== void 0 ? _a : 0;
+                        return totalSum + numberCaseDay;
+                    }, 0);
+                    const objMovingAverage = {
+                        movingAverage: Math.round(somaCasos / cases.length),
+                        date: cases[cases.length - 1].date
+                    };
+                    movingAverage.push(objMovingAverage);
+                }
+            }
+            return res.status(200).json(movingAverage);
+        });
+    },
     addCaseDay(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { week_number, date, uf_state, city, ibge_id, new_deaths, deaths, new_cases, total_cases, deaths_per_100k_inhabitants, totalCases_per_100k_inhabitants, deaths_by_totalCases, } = req.body;
