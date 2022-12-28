@@ -32,28 +32,32 @@ const CaseDay = {
         const lastCase = await caseDayModel.findOne().sort({ date: -1 })
 
         const lastWeekNumber = lastCase?.week_number ?? 0
+        const arrayCasesForWeek = new Array(lastWeekNumber).fill(null)
 
-        let movingAverage = []
+        let movingAverage: { movingAverage: number; date: Date }[] = []
 
-        for (let i = 16; i <= lastWeekNumber; i++) {
-            const cases = await caseDayModel.find({ week_number: i })
+        const arrayMovitest = arrayCasesForWeek.map(async (value, index) => {
+            const casesForWeek = await caseDayModel.find({ week_number: index + 1 })
 
-            if (cases.length > 0) {
-
-                const somaCasos = cases.reduce(function (totalSum, caseDay) {
+            if (casesForWeek.length > 0) {
+                const somaCasos = casesForWeek.reduce(function (totalSum, caseDay) {
                     const numberCaseDay = caseDay.new_cases ?? 0
 
                     return totalSum + numberCaseDay
                 }, 0)
 
-                const objMovingAverage = {
-                    movingAverage: Math.round(somaCasos / cases.length),
-                    date: cases[cases.length - 1].date
-                }
-
-                movingAverage.push(objMovingAverage)
+                movingAverage.push({
+                    movingAverage: Math.round(somaCasos / casesForWeek.length),
+                    date: casesForWeek[casesForWeek.length - 1].date ?? new Date()
+                })
             }
-        }
+        })
+
+        await Promise.all(arrayMovitest)
+
+        movingAverage.sort(function (a, b) {
+            return a.date?.getTime() - b.date?.getTime()
+        })
 
         return res.status(200).json(movingAverage)
 

@@ -48,22 +48,28 @@ const CaseDay = {
         return __awaiter(this, void 0, void 0, function* () {
             const lastCase = yield caseDayModel_1.default.findOne().sort({ date: -1 });
             const lastWeekNumber = (_a = lastCase === null || lastCase === void 0 ? void 0 : lastCase.week_number) !== null && _a !== void 0 ? _a : 0;
+            const arrayCasesForWeek = new Array(lastWeekNumber).fill(null);
             let movingAverage = [];
-            for (let i = 16; i <= lastWeekNumber; i++) {
-                const cases = yield caseDayModel_1.default.find({ week_number: i });
-                if (cases.length > 0) {
-                    const somaCasos = cases.reduce(function (totalSum, caseDay) {
+            const arrayMovitest = arrayCasesForWeek.map((value, index) => __awaiter(this, void 0, void 0, function* () {
+                var _b;
+                const casesForWeek = yield caseDayModel_1.default.find({ week_number: index + 1 });
+                if (casesForWeek.length > 0) {
+                    const somaCasos = casesForWeek.reduce(function (totalSum, caseDay) {
                         var _a;
                         const numberCaseDay = (_a = caseDay.new_cases) !== null && _a !== void 0 ? _a : 0;
                         return totalSum + numberCaseDay;
                     }, 0);
-                    const objMovingAverage = {
-                        movingAverage: Math.round(somaCasos / cases.length),
-                        date: cases[cases.length - 1].date
-                    };
-                    movingAverage.push(objMovingAverage);
+                    movingAverage.push({
+                        movingAverage: Math.round(somaCasos / casesForWeek.length),
+                        date: (_b = casesForWeek[casesForWeek.length - 1].date) !== null && _b !== void 0 ? _b : new Date()
+                    });
                 }
-            }
+            }));
+            yield Promise.all(arrayMovitest);
+            movingAverage.sort(function (a, b) {
+                var _a, _b;
+                return ((_a = a.date) === null || _a === void 0 ? void 0 : _a.getTime()) - ((_b = b.date) === null || _b === void 0 ? void 0 : _b.getTime());
+            });
             return res.status(200).json(movingAverage);
         });
     },
