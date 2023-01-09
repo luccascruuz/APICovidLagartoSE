@@ -1,0 +1,441 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API COVID-19 Lagarto-SE",
+        "description": "API com informações sobre a COVID-19 na cidade de Lagarto-SE",
+        "contact": {
+            "email": "luccasribe@gmail.com",
+            "name": "Luccas Ribeiro Cruz"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/cases-day": {
+            "get": {
+                "tags": [
+                    "Cases"
+                ],
+                "summary": "Informações dos casos",
+                "description": "Lista com as informações sobre covid, desde o primeiro caso confirmado até hoje",
+                "responses": {
+                    "200": {
+                        "description": "Informações sobre a covid, desde o primeiro caso confirmado até hoje",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "Array",
+                                    "properties": {
+                                        "_id": {
+                                            "type": "string"
+                                        },
+                                        "week_number": {
+                                            "type": "number"
+                                        },
+                                        "date": {
+                                            "type": "string"
+                                        },
+                                        "uf_state": {
+                                            "type": "string"
+                                        },
+                                        "city": {
+                                            "type": "string"
+                                        },
+                                        "ibge_id": {
+                                            "type": "string"
+                                        },
+                                        "new_deaths": {
+                                            "type": "number"
+                                        },
+                                        "deaths": {
+                                            "type": "number"
+                                        },
+                                        "new_cases": {
+                                            "type": "number"
+                                        },
+                                        "total_cases": {
+                                            "type": "number"
+                                        },
+                                        "deaths_per_100k_inhabitants": {
+                                            "type": "number"
+                                        },
+                                        "totalCases_per_100k_inhabitants": {
+                                            "type": "number"
+                                        },
+                                        "deaths_by_totalCases": {
+                                            "type": "number"
+                                        },
+                                        "createdAt": {
+                                            "type": "string"
+                                        },
+                                        "updatedAt": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "example": [
+                                        {
+                                            "_id": "6399f7e6fdf7434f8528309c",
+                                            "week_number": 16,
+                                            "date": "2020-04-16T00:00:00.000Z",
+                                            "uf_state": "SE",
+                                            "city": "Lagarto",
+                                            "ibge_id": "2803500",
+                                            "new_deaths": 0,
+                                            "deaths": 0,
+                                            "new_cases": 1,
+                                            "total_cases": 1,
+                                            "deaths_per_100k_inhabitants": 0,
+                                            "totalCases_per_100k_inhabitants": 0.943,
+                                            "deaths_by_totalCases": 0,
+                                            "createdAt": "2022-12-14T16:20:54.168Z",
+                                            "updatedAt": "2022-12-14T16:20:54.168Z"
+                                        },
+                                        {
+                                            "_id": "6399f7e7fdf7434f8528309e",
+                                            "week_number": 16,
+                                            "date": "2020-04-17T00:00:00.000Z",
+                                            "uf_state": "SE",
+                                            "city": "Lagarto",
+                                            "ibge_id": "2803500",
+                                            "new_deaths": 0,
+                                            "deaths": 0,
+                                            "new_cases": 0,
+                                            "total_cases": 1,
+                                            "deaths_per_100k_inhabitants": 0,
+                                            "totalCases_per_100k_inhabitants": 0.943,
+                                            "deaths_by_totalCases": 0,
+                                            "createdAt": "2022-12-14T16:20:55.252Z",
+                                            "updatedAt": "2022-12-14T16:20:55.252Z"
+                                        },
+                                        {
+                                            "_id": "6399f7e8fdf7434f852830a0",
+                                            "week_number": 16,
+                                            "date": "2020-04-18T00:00:00.000Z",
+                                            "uf_state": "SE",
+                                            "city": "Lagarto",
+                                            "ibge_id": "2803500",
+                                            "new_deaths": 0,
+                                            "deaths": 0,
+                                            "new_cases": 0,
+                                            "total_cases": 1,
+                                            "deaths_per_100k_inhabitants": 0,
+                                            "totalCases_per_100k_inhabitants": 0.943,
+                                            "deaths_by_totalCases": 0,
+                                            "createdAt": "2022-12-14T16:20:56.245Z",
+                                            "updatedAt": "2022-12-14T16:20:56.245Z"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/last-seven-days": {
+            "get": {
+                "tags": [
+                    "Cases"
+                ],
+                "summary": "Informações dos últimos sete dias",
+                "description": "Lista com informações de casos dos últimos sete dias",
+                "responses": {
+                    "200": {
+                        "description": "Informações sobre a covid dos últimos sete dias",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "Array",
+                                    "properties": {
+                                        "_id": {
+                                            "type": "string"
+                                        },
+                                        "week_number": {
+                                            "type": "number"
+                                        },
+                                        "date": {
+                                            "type": "string"
+                                        },
+                                        "uf_state": {
+                                            "type": "string"
+                                        },
+                                        "city": {
+                                            "type": "string"
+                                        },
+                                        "ibge_id": {
+                                            "type": "string"
+                                        },
+                                        "new_deaths": {
+                                            "type": "number"
+                                        },
+                                        "deaths": {
+                                            "type": "number"
+                                        },
+                                        "new_cases": {
+                                            "type": "number"
+                                        },
+                                        "total_cases": {
+                                            "type": "number"
+                                        },
+                                        "deaths_per_100k_inhabitants": {
+                                            "type": "number"
+                                        },
+                                        "totalCases_per_100k_inhabitants": {
+                                            "type": "number"
+                                        },
+                                        "deaths_by_totalCases": {
+                                            "type": "number"
+                                        },
+                                        "createdAt": {
+                                            "type": "string"
+                                        },
+                                        "updatedAt": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "example": [
+                                        {
+                                            "_id": "63b2b95517a68ce43213c3a7",
+                                            "week_number": 301,
+                                            "date": "2023-01-01T00:00:00.000Z",
+                                            "uf_state": "SE",
+                                            "city": "Lagarto",
+                                            "ibge_id": "2803500",
+                                            "new_deaths": 0,
+                                            "deaths": 244,
+                                            "new_cases": 0,
+                                            "total_cases": 10057,
+                                            "deaths_per_100k_inhabitants": 230.156,
+                                            "totalCases_per_100k_inhabitants": 9486.393,
+                                            "deaths_by_totalCases": 0.024,
+                                            "createdAt": "2023-01-02T11:00:37.911Z",
+                                            "updatedAt": "2023-01-02T11:00:37.911Z"
+                                        },
+                                        {
+                                            "_id": "63b40ad7f4ad69538e8a59e3",
+                                            "week_number": 301,
+                                            "date": "2023-01-02T00:00:00.000Z",
+                                            "uf_state": "SE",
+                                            "city": "Lagarto",
+                                            "ibge_id": "2803500",
+                                            "new_deaths": 0,
+                                            "deaths": 244,
+                                            "new_cases": 0,
+                                            "total_cases": 10057,
+                                            "deaths_per_100k_inhabitants": 230.156,
+                                            "totalCases_per_100k_inhabitants": 9486.393,
+                                            "deaths_by_totalCases": 0.024,
+                                            "createdAt": "2023-01-03T11:00:39.281Z",
+                                            "updatedAt": "2023-01-03T11:00:39.281Z"
+                                        },
+                                        {
+                                            "_id": "63b55c567494c94b8c439760",
+                                            "week_number": 301,
+                                            "date": "2023-01-03T00:00:00.000Z",
+                                            "uf_state": "SE",
+                                            "city": "Lagarto",
+                                            "ibge_id": "2803500",
+                                            "new_deaths": 0,
+                                            "deaths": 244,
+                                            "new_cases": 0,
+                                            "total_cases": 10057,
+                                            "deaths_per_100k_inhabitants": 230.156,
+                                            "totalCases_per_100k_inhabitants": 9486.393,
+                                            "deaths_by_totalCases": 0.024,
+                                            "createdAt": "2023-01-04T11:00:38.110Z",
+                                            "updatedAt": "2023-01-04T11:00:38.110Z"
+                                        },
+                                        {
+                                            "_id": "63b6add2c3ebb5736afe4414",
+                                            "week_number": 301,
+                                            "date": "2023-01-04T00:00:00.000Z",
+                                            "uf_state": "SE",
+                                            "city": "Lagarto",
+                                            "ibge_id": "2803500",
+                                            "new_deaths": 0,
+                                            "deaths": 244,
+                                            "new_cases": 0,
+                                            "total_cases": 10057,
+                                            "deaths_per_100k_inhabitants": 230.156,
+                                            "totalCases_per_100k_inhabitants": 9486.393,
+                                            "deaths_by_totalCases": 0.024,
+                                            "createdAt": "2023-01-05T11:00:34.713Z",
+                                            "updatedAt": "2023-01-05T11:00:34.713Z"
+                                        },
+                                        {
+                                            "_id": "63b7ff55573c9b35afab9b61",
+                                            "week_number": 301,
+                                            "date": "2023-01-05T00:00:00.000Z",
+                                            "uf_state": "SE",
+                                            "city": "Lagarto",
+                                            "ibge_id": "2803500",
+                                            "new_deaths": 0,
+                                            "deaths": 244,
+                                            "new_cases": 0,
+                                            "total_cases": 10057,
+                                            "deaths_per_100k_inhabitants": 230.156,
+                                            "totalCases_per_100k_inhabitants": 9486.393,
+                                            "deaths_by_totalCases": 0.024,
+                                            "createdAt": "2023-01-06T11:00:37.977Z",
+                                            "updatedAt": "2023-01-06T11:00:37.977Z"
+                                        },
+                                        {
+                                            "_id": "63b950d960bbce8b82904fc8",
+                                            "week_number": 301,
+                                            "date": "2023-01-06T00:00:00.000Z",
+                                            "uf_state": "SE",
+                                            "city": "Lagarto",
+                                            "ibge_id": "2803500",
+                                            "new_deaths": 0,
+                                            "deaths": 244,
+                                            "new_cases": 0,
+                                            "total_cases": 10060,
+                                            "deaths_per_100k_inhabitants": 230.156,
+                                            "totalCases_per_100k_inhabitants": 9489.223,
+                                            "deaths_by_totalCases": 0.024,
+                                            "createdAt": "2023-01-07T11:00:41.254Z",
+                                            "updatedAt": "2023-01-07T11:00:41.254Z"
+                                        },
+                                        {
+                                            "_id": "63baa25bc2162a8ee3a93e13",
+                                            "week_number": 301,
+                                            "date": "2023-01-07T00:00:00.000Z",
+                                            "uf_state": "SE",
+                                            "city": "Lagarto",
+                                            "ibge_id": "2803500",
+                                            "new_deaths": 0,
+                                            "deaths": 244,
+                                            "new_cases": 0,
+                                            "total_cases": 10060,
+                                            "deaths_per_100k_inhabitants": 230.156,
+                                            "totalCases_per_100k_inhabitants": 9489.223,
+                                            "deaths_by_totalCases": 0.024,
+                                            "createdAt": "2023-01-08T11:00:43.883Z",
+                                            "updatedAt": "2023-01-08T11:00:43.883Z"
+                                        },
+                                        {
+                                            "_id": "63bbf3d536eadef4451824c6",
+                                            "week_number": 302,
+                                            "date": "2023-01-08T00:00:00.000Z",
+                                            "uf_state": "SE",
+                                            "city": "Lagarto",
+                                            "ibge_id": "2803500",
+                                            "new_deaths": 0,
+                                            "deaths": 244,
+                                            "new_cases": 0,
+                                            "total_cases": 10060,
+                                            "deaths_per_100k_inhabitants": 230.156,
+                                            "totalCases_per_100k_inhabitants": 9489.223,
+                                            "deaths_by_totalCases": 0.024,
+                                            "createdAt": "2023-01-09T11:00:37.186Z",
+                                            "updatedAt": "2023-01-09T11:00:37.186Z"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/total-cases-and-deaths": {
+            "get": {
+                "tags": [
+                    "Cases"
+                ],
+                "summary": "Informações dos casos e óbitos totais",
+                "description": "Informações dos últimos casos e óbitos confirmados e os totais.",
+                "responses": {
+                    "200": {
+                        "description": "Informações dos últimos casos e óbitos confirmados e dos todais de casos e óbitos confirmados.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "Object",
+                                    "properties": {
+                                        "totalCases": {
+                                            "type": "number"
+                                        },
+                                        "totalDeaths": {
+                                            "type": "number"
+                                        },
+                                        "casesToday": {
+                                            "type": "number"
+                                        },
+                                        "deathsToday": {
+                                            "type": "number"
+                                        },
+                                        "date": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "example": {
+                                        "totalCases": 10060,
+                                        "totalDeaths": 244,
+                                        "casesToday": 0,
+                                        "deathsToday": 0,
+                                        "date": "2023-01-08T00:00:00.000Z"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/moving-average-of-cases": {
+            "get": {
+                "tags": [
+                    "Cases"
+                ],
+                "summary": "Informações da média móvel de casos por semana",
+                "description": "Lista com as informações sobre a média móvel de casos por semana",
+                "responses": {
+                    "200": {
+                        "description": "Lista com as informações sobre a média móvel de casos por semana",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "Array",
+                                    "properties": {
+                                        "movingAverage": {
+                                            "type": "number"
+                                        },
+                                        "date": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "example": [
+                                        {
+                                            "movingAverage": 9,
+                                            "date": "2022-12-10T00:00:00.000Z"
+                                        },
+                                        {
+                                            "movingAverage": 13,
+                                            "date": "2022-12-17T00:00:00.000Z"
+                                        },
+                                        {
+                                            "movingAverage": 3,
+                                            "date": "2022-12-24T00:00:00.000Z"
+                                        },
+                                        {
+                                            "movingAverage": 1,
+                                            "date": "2022-12-31T00:00:00.000Z"
+                                        },
+                                        {
+                                            "movingAverage": 0,
+                                            "date": "2023-01-07T00:00:00.000Z"
+                                        },
+                                        {
+                                            "movingAverage": 0,
+                                            "date": "2023-01-08T00:00:00.000Z"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
