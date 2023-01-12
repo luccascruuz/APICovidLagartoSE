@@ -5,13 +5,12 @@ const Vaccination = {
     async index(req: Request, res: Response) {
         try {
             const page = req.query.page ? Number(req.query.page) : 1;
-            const dose = req.query.dose ? { dose: Number(req.query.dose) } : {};
-            const vaccinationsLength = (await vaccinationModel.find(dose)).length;
-            const limit = 50;
+            const vaccinationsLength = await vaccinationModel.find().count()
+            const limit = 100;
             const totalPages = Math.ceil(vaccinationsLength / limit);
             const skip = limit * (page - 1);
             const vaccinations = await vaccinationModel
-                .find(dose)
+                .find()
                 .skip(skip)
                 .limit(limit);
             return res
@@ -29,17 +28,19 @@ const Vaccination = {
 
     async totalDosesApplied(req: Request, res: Response) {
         try {
-            const vaccinationsLength = (await vaccinationModel.find()).length;
-            const vaccinationsFirstDoseLength = (await vaccinationModel.find({ dose: 1 })).length;
-            const vaccinationsSecondDoseLength = (await vaccinationModel.find({ dose: 2 })).length;
-            const vaccinationsThirdDoseLength = (await vaccinationModel.find({ dose: 3 })).length;
-            const vaccinationsFourthDoseLength = (await vaccinationModel.find({ dose: 4 })).length;
+            const vaccinationsFirstDoseLength = await vaccinationModel.find({ vacina_descricao_dose: "1ª Dose" }).count();
+            const vaccinationsSecondDoseLength = await vaccinationModel.find({ vacina_descricao_dose: "2ª Dose" }).count();
+            const vaccinationsThirdDoseLength = await vaccinationModel.find({ vacina_descricao_dose: "Reforço" }).count();
+            const vaccinationsFourthDoseLength = await vaccinationModel.find({ vacina_descricao_dose: "2º Reforço" }).count();
+            const vaccinationsFifthDoseLength = await vaccinationModel.find({ vacina_descricao_dose: "3º Reforço" }).count();
+            const vaccinationsLength = await vaccinationModel.find().count()
 
             const totalDoses = {
                 firstDose: vaccinationsFirstDoseLength,
                 secondDose: vaccinationsSecondDoseLength,
                 thirdDose: vaccinationsThirdDoseLength,
                 fourthDose: vaccinationsFourthDoseLength,
+                fifthDose: vaccinationsFifthDoseLength,
                 totalDoses: vaccinationsLength
             }
 
@@ -51,16 +52,38 @@ const Vaccination = {
 
     async addVaccination(req: Request, res: Response) {
         const {
-            date,
-            state,
-            city,
-            ibgeID,
-            dose,
-            vaccine,
-            sex,
-            age,
-            count,
-            pop2021,
+            document_id,
+            paciente_id,
+            paciente_idade,
+            paciente_dataNascimento,
+            paciente_enumSexoBiologico,
+            paciente_racaCor_codigo,
+            paciente_racaCor_valor,
+            paciente_endereco_coIbgeMunicipio,
+            paciente_endereco_coPais,
+            paciente_endereco_nmMunicipio,
+            paciente_endereco_nmPais,
+            paciente_endereco_uf,
+            paciente_endereco_cep,
+            paciente_nacionalidade_enumNacionalidade,
+            estabelecimento_valor,
+            estabelecimento_razaoSocial,
+            estalecimento_noFantasia,
+            estabelecimento_municipio_codigo,
+            estabelecimento_municipio_nome,
+            estabelecimento_uf,
+            vacina_grupoAtendimento_codigo,
+            vacina_grupoAtendimento_nome,
+            vacina_categoria_codigo,
+            vacina_categoria_nome,
+            vacina_lote,
+            vacina_fabricante_nome,
+            vacina_fabricante_referencia,
+            vacina_dataAplicacao,
+            vacina_descricao_dose,
+            vacina_codigo,
+            vacina_nome,
+            sistema_origem
         } = req.body;
 
         try {
