@@ -17,60 +17,80 @@ const caseDayModel_1 = __importDefault(require("../Models/caseDayModel"));
 const CaseDay = {
     index(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const cases = yield caseDayModel_1.default.find();
-            return res.status(200).json(cases);
+            try {
+                const cases = yield caseDayModel_1.default.find();
+                return res.status(200).json(cases);
+            }
+            catch (error) {
+                return res.status(500).json({ error: error });
+            }
         });
     },
     totalCasesAndDeaths(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const cases = yield caseDayModel_1.default.findOne().sort({ date: -1 });
-            return res.status(200).json({
-                totalCases: cases === null || cases === void 0 ? void 0 : cases.total_cases,
-                totalDeaths: cases === null || cases === void 0 ? void 0 : cases.deaths,
-                casesToday: cases === null || cases === void 0 ? void 0 : cases.new_cases,
-                deathsToday: cases === null || cases === void 0 ? void 0 : cases.new_deaths,
-                date: cases === null || cases === void 0 ? void 0 : cases.date
-            });
+            try {
+                const cases = yield caseDayModel_1.default.findOne().sort({ date: -1 });
+                return res.status(200).json({
+                    totalCases: cases === null || cases === void 0 ? void 0 : cases.total_cases,
+                    totalDeaths: cases === null || cases === void 0 ? void 0 : cases.deaths,
+                    casesToday: cases === null || cases === void 0 ? void 0 : cases.new_cases,
+                    deathsToday: cases === null || cases === void 0 ? void 0 : cases.new_deaths,
+                    date: cases === null || cases === void 0 ? void 0 : cases.date
+                });
+            }
+            catch (error) {
+                return res.status(500).json({ error: error });
+            }
         });
     },
     lastSevenDays(req, res) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            const lastCase = yield caseDayModel_1.default.findOne().sort({ date: -1 });
-            const dateLastCase = (0, date_fns_1.format)((0, date_fns_1.addHours)(new Date((_a = lastCase === null || lastCase === void 0 ? void 0 : lastCase.date) !== null && _a !== void 0 ? _a : ''), 3), 'yyyy/MM/dd');
-            const dateLastSevenDay = (0, date_fns_1.format)((0, date_fns_1.subDays)((0, date_fns_1.addHours)(new Date(dateLastCase), 3), 7), 'yyyy/MM/dd');
-            const cases = yield caseDayModel_1.default.find({ date: { $gte: dateLastSevenDay, $lte: dateLastCase } });
-            return res.status(200).json(cases);
+            try {
+                const lastCase = yield caseDayModel_1.default.findOne().sort({ date: -1 });
+                const dateLastCase = (0, date_fns_1.format)((0, date_fns_1.addHours)(new Date((_a = lastCase === null || lastCase === void 0 ? void 0 : lastCase.date) !== null && _a !== void 0 ? _a : ''), 3), 'yyyy/MM/dd');
+                const dateLastSevenDay = (0, date_fns_1.format)((0, date_fns_1.subDays)((0, date_fns_1.addHours)(new Date(dateLastCase), 3), 7), 'yyyy/MM/dd');
+                const cases = yield caseDayModel_1.default.find({ date: { $gte: dateLastSevenDay, $lte: dateLastCase } });
+                return res.status(200).json(cases);
+            }
+            catch (error) {
+                return res.status(500).json({ error: error });
+            }
         });
     },
     movingAverageOfCases(req, res) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            const lastCase = yield caseDayModel_1.default.findOne().sort({ date: -1 });
-            const lastWeekNumber = (_a = lastCase === null || lastCase === void 0 ? void 0 : lastCase.week_number) !== null && _a !== void 0 ? _a : 0;
-            const arrayCasesForWeek = new Array(lastWeekNumber).fill(null);
-            let movingAverage = [];
-            const arrayMovitest = arrayCasesForWeek.map((value, index) => __awaiter(this, void 0, void 0, function* () {
-                var _b;
-                const casesForWeek = yield caseDayModel_1.default.find({ week_number: index + 1 });
-                if (casesForWeek.length > 0) {
-                    const somaCasos = casesForWeek.reduce(function (totalSum, caseDay) {
-                        var _a;
-                        const numberCaseDay = (_a = caseDay.new_cases) !== null && _a !== void 0 ? _a : 0;
-                        return totalSum + numberCaseDay;
-                    }, 0);
-                    movingAverage.push({
-                        movingAverage: Math.round(somaCasos / casesForWeek.length),
-                        date: (_b = casesForWeek[casesForWeek.length - 1].date) !== null && _b !== void 0 ? _b : new Date()
-                    });
-                }
-            }));
-            yield Promise.all(arrayMovitest);
-            movingAverage.sort(function (a, b) {
-                var _a, _b;
-                return ((_a = a.date) === null || _a === void 0 ? void 0 : _a.getTime()) - ((_b = b.date) === null || _b === void 0 ? void 0 : _b.getTime());
-            });
-            return res.status(200).json(movingAverage);
+            try {
+                const lastCase = yield caseDayModel_1.default.findOne().sort({ date: -1 });
+                const lastWeekNumber = (_a = lastCase === null || lastCase === void 0 ? void 0 : lastCase.week_number) !== null && _a !== void 0 ? _a : 0;
+                const arrayCasesForWeek = new Array(lastWeekNumber).fill(null);
+                let movingAverage = [];
+                const arrayMovitest = arrayCasesForWeek.map((value, index) => __awaiter(this, void 0, void 0, function* () {
+                    var _b;
+                    const casesForWeek = yield caseDayModel_1.default.find({ week_number: index + 1 });
+                    if (casesForWeek.length > 0) {
+                        const somaCasos = casesForWeek.reduce(function (totalSum, caseDay) {
+                            var _a;
+                            const numberCaseDay = (_a = caseDay.new_cases) !== null && _a !== void 0 ? _a : 0;
+                            return totalSum + numberCaseDay;
+                        }, 0);
+                        movingAverage.push({
+                            movingAverage: Math.round(somaCasos / casesForWeek.length),
+                            date: (_b = casesForWeek[casesForWeek.length - 1].date) !== null && _b !== void 0 ? _b : new Date()
+                        });
+                    }
+                }));
+                yield Promise.all(arrayMovitest);
+                movingAverage.sort(function (a, b) {
+                    var _a, _b;
+                    return ((_a = a.date) === null || _a === void 0 ? void 0 : _a.getTime()) - ((_b = b.date) === null || _b === void 0 ? void 0 : _b.getTime());
+                });
+                return res.status(200).json(movingAverage);
+            }
+            catch (error) {
+                return res.status(500).json({ error: error });
+            }
         });
     },
     addCaseDay(req, res) {
@@ -81,7 +101,7 @@ const CaseDay = {
                 return res.status(201).json({ message: "Caso do dia adicionado com sucesso", data: caseDay });
             }
             catch (error) {
-                res.status(500).json({ error: error });
+                return res.status(500).json({ error: error });
             }
         });
     },

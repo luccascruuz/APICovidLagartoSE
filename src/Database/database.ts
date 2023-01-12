@@ -7,8 +7,8 @@ const connectDatabase = () => {
 
 
     mongoose.connect(mongo_uri)
-    .then(() => console.log('MongoDB Connected!'))
-    .catch((err) => console.log(`Error connecting to MongoDB Atlas: ${err}`))
+        .then(() => console.log('MongoDB Connected!'))
+        .catch((err) => console.log(`Error connecting to MongoDB Atlas: ${err}`))
 }
 
 export default connectDatabase;

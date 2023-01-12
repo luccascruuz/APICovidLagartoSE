@@ -1,8 +1,9 @@
 import { Request, Response } from 'express'
-import { format, subDays, addDays, addHours } from 'date-fns'
+import { format, subDays, addHours } from 'date-fns'
 import caseDayModel from '../Models/caseDayModel'
 
 const CaseDay = {
+
     async index(req: Request, res: Response) {
 
         try {
@@ -13,6 +14,7 @@ const CaseDay = {
             return res.status(500).json({ error: error })
         }
     },
+
     async totalCasesAndDeaths(req: Request, res: Response) {
         try {
             const cases = await caseDayModel.findOne().sort({ date: -1 })
@@ -27,6 +29,7 @@ const CaseDay = {
             return res.status(500).json({ error: error })
         }
     },
+
     async lastSevenDays(req: Request, res: Response) {
         try {
             const lastCase = await caseDayModel.findOne().sort({ date: -1 })
@@ -42,10 +45,10 @@ const CaseDay = {
             return res.status(500).json({ error: error })
         }
     },
+
     async movingAverageOfCases(req: Request, res: Response) {
         try {
             const lastCase = await caseDayModel.findOne().sort({ date: -1 })
-
             const lastWeekNumber = lastCase?.week_number ?? 0
             const arrayCasesForWeek = new Array(lastWeekNumber).fill(null)
 
@@ -53,7 +56,6 @@ const CaseDay = {
 
             const arrayMovitest = arrayCasesForWeek.map(async (value, index) => {
                 const casesForWeek = await caseDayModel.find({ week_number: index + 1 })
-
                 if (casesForWeek.length > 0) {
                     const somaCasos = casesForWeek.reduce(function (totalSum, caseDay) {
                         const numberCaseDay = caseDay.new_cases ?? 0
@@ -67,19 +69,15 @@ const CaseDay = {
                     })
                 }
             })
-
             await Promise.all(arrayMovitest)
-
             movingAverage.sort(function (a, b) {
                 return a.date?.getTime() - b.date?.getTime()
             })
-
             return res.status(200).json(movingAverage)
         }
         catch (error) {
             return res.status(500).json({ error: error })
         }
-
     },
     async addCaseDay(req: Request, res: Response) {
         const {

@@ -4,6 +4,6 @@ declare const CaseDay: {
     totalCasesAndDeaths(req: Request, res: Response): Promise<Response<any, Record<string, any>>>;
     lastSevenDays(req: Request, res: Response): Promise<Response<any, Record<string, any>>>;
     movingAverageOfCases(req: Request, res: Response): Promise<Response<any, Record<string, any>>>;
-    addCaseDay(req: Request, res: Response): Promise<Response<any, Record<string, any>> | undefined>;
+    addCaseDay(req: Request, res: Response): Promise<Response<any, Record<string, any>>>;
 };
 export default CaseDay;
