@@ -14,11 +14,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const date_fns_1 = require("date-fns");
 const caseDayModel_1 = __importDefault(require("../Models/caseDayModel"));
+const redis_config_1 = require("../redis-config");
 const CaseDay = {
     index(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const casesRedis = yield (0, redis_config_1.getRedis)('casesDay');
+                if (casesRedis)
+                    return res.status(200).json(JSON.parse(casesRedis));
                 const cases = yield caseDayModel_1.default.find();
+                yield (0, redis_config_1.setRedis)('casesDay', JSON.stringify(cases));
                 return res.status(200).json(cases);
             }
             catch (error) {
@@ -29,14 +34,19 @@ const CaseDay = {
     totalCasesAndDeaths(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const totalCasesAndDeathsRedis = yield (0, redis_config_1.getRedis)('totalCasesAndDeaths');
+                if (totalCasesAndDeathsRedis)
+                    return res.status(200).json(JSON.parse(totalCasesAndDeathsRedis));
                 const cases = yield caseDayModel_1.default.findOne().sort({ date: -1 });
-                return res.status(200).json({
+                const objTotalCasesAndDeaths = {
                     totalCases: cases === null || cases === void 0 ? void 0 : cases.total_cases,
                     totalDeaths: cases === null || cases === void 0 ? void 0 : cases.deaths,
                     casesToday: cases === null || cases === void 0 ? void 0 : cases.new_cases,
                     deathsToday: cases === null || cases === void 0 ? void 0 : cases.new_deaths,
                     date: cases === null || cases === void 0 ? void 0 : cases.date
-                });
+                };
+                yield (0, redis_config_1.setRedis)('totalCasesAndDeaths', JSON.stringify(objTotalCasesAndDeaths));
+                return res.status(200).json(objTotalCasesAndDeaths);
             }
             catch (error) {
                 return res.status(500).json({ error: error });
@@ -47,10 +57,14 @@ const CaseDay = {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const lastSevenDaysRedis = yield (0, redis_config_1.getRedis)('lastSevenDays');
+                if (lastSevenDaysRedis)
+                    return res.status(200).json(JSON.parse(lastSevenDaysRedis));
                 const lastCase = yield caseDayModel_1.default.findOne().sort({ date: -1 });
                 const dateLastCase = (0, date_fns_1.format)((0, date_fns_1.addHours)(new Date((_a = lastCase === null || lastCase === void 0 ? void 0 : lastCase.date) !== null && _a !== void 0 ? _a : ''), 3), 'yyyy/MM/dd');
                 const dateLastSevenDay = (0, date_fns_1.format)((0, date_fns_1.subDays)((0, date_fns_1.addHours)(new Date(dateLastCase), 3), 7), 'yyyy/MM/dd');
                 const cases = yield caseDayModel_1.default.find({ date: { $gte: dateLastSevenDay, $lte: dateLastCase } });
+                yield (0, redis_config_1.setRedis)('lastSevenDays', JSON.stringify(cases));
                 return res.status(200).json(cases);
             }
             catch (error) {
@@ -62,6 +76,9 @@ const CaseDay = {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const movingAverageOfCasesRedis = yield (0, redis_config_1.getRedis)('movingAverageOfCases');
+                if (movingAverageOfCasesRedis)
+                    return res.status(200).json(JSON.parse(movingAverageOfCasesRedis));
                 const lastCase = yield caseDayModel_1.default.findOne().sort({ date: -1 });
                 const lastWeekNumber = (_a = lastCase === null || lastCase === void 0 ? void 0 : lastCase.week_number) !== null && _a !== void 0 ? _a : 0;
                 const arrayCasesForWeek = new Array(lastWeekNumber).fill(null);
@@ -86,6 +103,7 @@ const CaseDay = {
                     var _a, _b;
                     return ((_a = a.date) === null || _a === void 0 ? void 0 : _a.getTime()) - ((_b = b.date) === null || _b === void 0 ? void 0 : _b.getTime());
                 });
+                yield (0, redis_config_1.setRedis)('movingAverageOfCases', JSON.stringify(movingAverage));
                 return res.status(200).json(movingAverage);
             }
             catch (error) {
@@ -98,6 +116,7 @@ const CaseDay = {
             const { week_number, date, uf_state, city, ibge_id, new_deaths, deaths, new_cases, total_cases, deaths_per_100k_inhabitants, totalCases_per_100k_inhabitants, deaths_by_totalCases, } = req.body;
             try {
                 const caseDay = yield caseDayModel_1.default.create(req.body);
+                yield (0, redis_config_1.deleteRedis)(['casesDay', 'totalCasesAndDeaths', 'lastSevenDays', 'movingAverageOfCases']);
                 return res.status(201).json({ message: "Caso do dia adicionado com sucesso", data: caseDay });
             }
             catch (error) {
