@@ -1,9 +1,21 @@
 import { Request, Response } from "express";
 import vaccinationModel from "../Models/vaccinationModel";
+import { deleteRedis, getRedis, setRedis } from "../redis-config";
 
 const Vaccination = {
     async index(req: Request, res: Response) {
         try {
+            const vaccinationRedis = await getRedis(`vaccinationPage`)
+
+            if (vaccinationRedis) {
+                const jsonVaccinationRedis = JSON.parse(vaccinationRedis)
+                const pageQuery = req.query.page ? Number(req.query.page) : 1;
+
+                if (jsonVaccinationRedis.page == pageQuery) {
+                    return res.status(200).json(jsonVaccinationRedis)
+                }
+            }
+
             const page = req.query.page ? Number(req.query.page) : 1;
             const vaccinationsLength = await vaccinationModel.find().count()
             const limit = 100;
@@ -13,14 +25,19 @@ const Vaccination = {
                 .find()
                 .skip(skip)
                 .limit(limit);
+
+            const objPaginatedVaccination = {
+                page: page,
+                totalPages: totalPages,
+                totalVaccinations: vaccinationsLength,
+                vaccinations: vaccinations,
+            }
+
+            await setRedis('vaccinationPage', JSON.stringify(objPaginatedVaccination))
+
             return res
                 .status(200)
-                .json({
-                    page: page,
-                    totalPages: totalPages,
-                    totalVaccinations: vaccinationsLength,
-                    vaccinations: vaccinations,
-                });
+                .json(objPaginatedVaccination);
         } catch (error) {
             return res.status(500).json({ error: error });
         }
@@ -28,6 +45,10 @@ const Vaccination = {
 
     async totalDosesApplied(req: Request, res: Response) {
         try {
+            const totalDosesAppliedRedis = await getRedis('totalDosesApplied')
+
+            if (totalDosesAppliedRedis) return res.status(200).json(JSON.parse(totalDosesAppliedRedis))
+
             const vaccinationsFirstDoseLength = await vaccinationModel.find({ vacina_descricao_dose: "1ª Dose" }).count();
             const vaccinationsSecondDoseLength = await vaccinationModel.find({ vacina_descricao_dose: "2ª Dose" }).count();
             const vaccinationsThirdDoseLength = await vaccinationModel.find({ vacina_descricao_dose: "Reforço" }).count();
@@ -43,6 +64,8 @@ const Vaccination = {
                 fifthDose: vaccinationsFifthDoseLength,
                 totalDoses: vaccinationsLength
             }
+
+            await setRedis('totalDosesApplied', JSON.stringify(totalDoses))
 
             return res.status(200).json(totalDoses)
         } catch (error) {
@@ -88,6 +111,7 @@ const Vaccination = {
 
         try {
             const vaccination = await vaccinationModel.create(req.body);
+            await deleteRedis(['vaccinationPage', 'totalDosesApplied'])
             return res
                 .status(201)
                 .json({ message: "Vacina adicionada com sucesso", data: vaccination });
