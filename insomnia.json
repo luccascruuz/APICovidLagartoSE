@@ -1,0 +1,1116 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-11-04T16:40:02.517Z",
+  "__export_source": "api-srag-lagarto-se",
+  "resources": [
+    {
+      "_id": "wrk_sraglagarto",
+      "_type": "workspace",
+      "parentId": null,
+      "name": "API SRAG Lagarto-SE",
+      "description": "Casos de SRAG de Lagarto-SE (SIVEP-Gripe / OpenDataSUS). Docs: {{ _.base_url }}/docs",
+      "scope": "collection",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "env_sraglagarto_base",
+      "_type": "environment",
+      "parentId": "wrk_sraglagarto",
+      "name": "Base Environment",
+      "data": {},
+      "dataPropertyOrder": null,
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 1,
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "env_sraglagarto_local",
+      "_type": "environment",
+      "parentId": "env_sraglagarto_base",
+      "name": "Local",
+      "color": "#7d69cb",
+      "isPrivate": false,
+      "metaSortKey": 2,
+      "created": 1793810402517,
+      "modified": 1793810402517,
+      "data": {
+        "base_url": "http://localhost:3333",
+        "admin_token": "cole-aqui-o-ADMIN_TOKEN-do-seu-.env",
+        "ano": "2026",
+        "caso_id": "31782924125990"
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url",
+          "admin_token",
+          "ano",
+          "caso_id"
+        ]
+      }
+    },
+    {
+      "_id": "fld_srag0001",
+      "_type": "request_group",
+      "parentId": "wrk_sraglagarto",
+      "name": "Casos",
+      "description": "GET /v1/srag/casos — lista paginada (limite máx. 100)",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1000,
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0002",
+      "_type": "request",
+      "parentId": "fld_srag0001",
+      "name": "Listar casos (todos os filtros)",
+      "description": "Todos os filtros disponíveis estão na aba Query, desativados. Marque os que quiser usar. Listas aceitam valores separados por vírgula.",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/casos",
+      "parameters": [
+        {
+          "id": "pair_srag0003",
+          "name": "pagina",
+          "value": "1",
+          "disabled": false
+        },
+        {
+          "id": "pair_srag0004",
+          "name": "limite",
+          "value": "50",
+          "disabled": false
+        },
+        {
+          "id": "pair_srag0005",
+          "name": "ordem",
+          "value": "desc",
+          "disabled": false
+        },
+        {
+          "id": "pair_srag0006",
+          "name": "ano",
+          "value": "{{ _.ano }}",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0007",
+          "name": "semanaInicio",
+          "value": "1",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0008",
+          "name": "semanaFim",
+          "value": "52",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0009",
+          "name": "dataInicio",
+          "value": "2026-01-01",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0010",
+          "name": "dataFim",
+          "value": "2026-12-31",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0011",
+          "name": "classificacao",
+          "value": "influenza,covid19,outro_virus,outro_agente,nao_especificado,em_investigacao",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0012",
+          "name": "evolucao",
+          "value": "cura,obito,obito_outras_causas,ignorado,em_aberto",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0013",
+          "name": "sexo",
+          "value": "masculino,feminino,ignorado",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0014",
+          "name": "faixaEtaria",
+          "value": "menor_1,1_4,5_9,10_19,20_29,30_39,40_49,50_59,60_69,70_79,80_mais",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0015",
+          "name": "agente",
+          "value": "covid19,influenza_a,influenza_b,vsr,rinovirus",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0016",
+          "name": "hospitalizado",
+          "value": "sim",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0017",
+          "name": "uti",
+          "value": "sim",
+          "disabled": true
+        }
+      ],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 0,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0018",
+      "_type": "request",
+      "parentId": "fld_srag0001",
+      "name": "Casos do ano",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/casos",
+      "parameters": [
+        {
+          "id": "pair_srag0019",
+          "name": "ano",
+          "value": "{{ _.ano }}",
+          "disabled": false
+        },
+        {
+          "id": "pair_srag0020",
+          "name": "limite",
+          "value": "100",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 100,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0021",
+      "_type": "request",
+      "parentId": "fld_srag0001",
+      "name": "Óbitos por SRAG",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/casos",
+      "parameters": [
+        {
+          "id": "pair_srag0022",
+          "name": "evolucao",
+          "value": "obito",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 200,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0023",
+      "_type": "request",
+      "parentId": "fld_srag0001",
+      "name": "Internados em UTI",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/casos",
+      "parameters": [
+        {
+          "id": "pair_srag0024",
+          "name": "ano",
+          "value": "{{ _.ano }}",
+          "disabled": false
+        },
+        {
+          "id": "pair_srag0025",
+          "name": "uti",
+          "value": "sim",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 300,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0026",
+      "_type": "request",
+      "parentId": "fld_srag0001",
+      "name": "Menores de 1 ano com VSR",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/casos",
+      "parameters": [
+        {
+          "id": "pair_srag0027",
+          "name": "faixaEtaria",
+          "value": "menor_1",
+          "disabled": false
+        },
+        {
+          "id": "pair_srag0028",
+          "name": "agente",
+          "value": "vsr",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 400,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0029",
+      "_type": "request",
+      "parentId": "fld_srag0001",
+      "name": "Influenza e covid-19",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/casos",
+      "parameters": [
+        {
+          "id": "pair_srag0030",
+          "name": "classificacao",
+          "value": "influenza,covid19",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 500,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0031",
+      "_type": "request",
+      "parentId": "fld_srag0001",
+      "name": "Por período (início dos sintomas)",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/casos",
+      "parameters": [
+        {
+          "id": "pair_srag0032",
+          "name": "dataInicio",
+          "value": "2026-03-01",
+          "disabled": false
+        },
+        {
+          "id": "pair_srag0033",
+          "name": "dataFim",
+          "value": "2026-05-31",
+          "disabled": false
+        },
+        {
+          "id": "pair_srag0034",
+          "name": "ordem",
+          "value": "asc",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 600,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0035",
+      "_type": "request",
+      "parentId": "fld_srag0001",
+      "name": "Por semana epidemiológica",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/casos",
+      "parameters": [
+        {
+          "id": "pair_srag0036",
+          "name": "ano",
+          "value": "{{ _.ano }}",
+          "disabled": false
+        },
+        {
+          "id": "pair_srag0037",
+          "name": "semanaInicio",
+          "value": "10",
+          "disabled": false
+        },
+        {
+          "id": "pair_srag0038",
+          "name": "semanaFim",
+          "value": "20",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 700,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0039",
+      "_type": "request",
+      "parentId": "fld_srag0001",
+      "name": "Caso por id (número da notificação)",
+      "description": "Troque a variável caso_id no ambiente por um id retornado em Listar casos.",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/casos/{{ _.caso_id }}",
+      "parameters": [],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 800,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "fld_srag0040",
+      "_type": "request_group",
+      "parentId": "wrk_sraglagarto",
+      "name": "Resumo",
+      "description": "GET /v1/srag/resumo — totais e distribuições. Aceita os mesmos filtros de /casos.",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -2000,
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0041",
+      "_type": "request",
+      "parentId": "fld_srag0040",
+      "name": "Resumo geral (todos os anos carregados)",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/resumo",
+      "parameters": [
+        {
+          "id": "pair_srag0042",
+          "name": "ano",
+          "value": "{{ _.ano }}",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0043",
+          "name": "semanaInicio",
+          "value": "1",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0044",
+          "name": "semanaFim",
+          "value": "52",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0045",
+          "name": "dataInicio",
+          "value": "2026-01-01",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0046",
+          "name": "dataFim",
+          "value": "2026-12-31",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0047",
+          "name": "classificacao",
+          "value": "influenza,covid19,outro_virus,outro_agente,nao_especificado,em_investigacao",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0048",
+          "name": "evolucao",
+          "value": "cura,obito,obito_outras_causas,ignorado,em_aberto",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0049",
+          "name": "sexo",
+          "value": "masculino,feminino,ignorado",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0050",
+          "name": "faixaEtaria",
+          "value": "menor_1,1_4,5_9,10_19,20_29,30_39,40_49,50_59,60_69,70_79,80_mais",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0051",
+          "name": "agente",
+          "value": "covid19,influenza_a,influenza_b,vsr,rinovirus",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0052",
+          "name": "hospitalizado",
+          "value": "sim",
+          "disabled": true
+        },
+        {
+          "id": "pair_srag0053",
+          "name": "uti",
+          "value": "sim",
+          "disabled": true
+        }
+      ],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 0,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0054",
+      "_type": "request",
+      "parentId": "fld_srag0040",
+      "name": "Resumo do ano",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/resumo",
+      "parameters": [
+        {
+          "id": "pair_srag0055",
+          "name": "ano",
+          "value": "{{ _.ano }}",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 100,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0056",
+      "_type": "request",
+      "parentId": "fld_srag0040",
+      "name": "Resumo 2025 + 2026",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/resumo",
+      "parameters": [
+        {
+          "id": "pair_srag0057",
+          "name": "ano",
+          "value": "2025,2026",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 200,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0058",
+      "_type": "request",
+      "parentId": "fld_srag0040",
+      "name": "Resumo de idosos (60+)",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/resumo",
+      "parameters": [
+        {
+          "id": "pair_srag0059",
+          "name": "faixaEtaria",
+          "value": "60_69,70_79,80_mais",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 300,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "fld_srag0060",
+      "_type": "request_group",
+      "parentId": "wrk_sraglagarto",
+      "name": "Semanas",
+      "description": "GET /v1/srag/semanas — série por semana epidemiológica com média móvel",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -3000,
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0061",
+      "_type": "request",
+      "parentId": "fld_srag0060",
+      "name": "Série semanal do ano",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/semanas",
+      "parameters": [
+        {
+          "id": "pair_srag0062",
+          "name": "ano",
+          "value": "{{ _.ano }}",
+          "disabled": false
+        },
+        {
+          "id": "pair_srag0063",
+          "name": "janela",
+          "value": "3",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 0,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0064",
+      "_type": "request",
+      "parentId": "fld_srag0060",
+      "name": "Série 2025 (média móvel de 4 semanas)",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/semanas",
+      "parameters": [
+        {
+          "id": "pair_srag0065",
+          "name": "ano",
+          "value": "2025",
+          "disabled": false
+        },
+        {
+          "id": "pair_srag0066",
+          "name": "janela",
+          "value": "4",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 100,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0067",
+      "_type": "request",
+      "parentId": "fld_srag0060",
+      "name": "Série só de influenza",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/semanas",
+      "parameters": [
+        {
+          "id": "pair_srag0068",
+          "name": "ano",
+          "value": "{{ _.ano }}",
+          "disabled": false
+        },
+        {
+          "id": "pair_srag0069",
+          "name": "classificacao",
+          "value": "influenza",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 200,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0070",
+      "_type": "request",
+      "parentId": "fld_srag0060",
+      "name": "Série de casos em UTI",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/semanas",
+      "parameters": [
+        {
+          "id": "pair_srag0071",
+          "name": "ano",
+          "value": "{{ _.ano }}",
+          "disabled": false
+        },
+        {
+          "id": "pair_srag0072",
+          "name": "uti",
+          "value": "sim",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 300,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "fld_srag0073",
+      "_type": "request_group",
+      "parentId": "wrk_sraglagarto",
+      "name": "Sistema",
+      "description": "Saúde, origem dos dados e documentação",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -4000,
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0074",
+      "_type": "request",
+      "parentId": "fld_srag0073",
+      "name": "Health",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/health",
+      "parameters": [],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 0,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0075",
+      "_type": "request",
+      "parentId": "fld_srag0073",
+      "name": "Fonte dos dados e status da sincronização",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/fonte",
+      "parameters": [],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 100,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0076",
+      "_type": "request",
+      "parentId": "fld_srag0073",
+      "name": "Dicionário de valores",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/dicionario",
+      "parameters": [],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 200,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0077",
+      "_type": "request",
+      "parentId": "fld_srag0073",
+      "name": "OpenAPI (JSON)",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/openapi.json",
+      "parameters": [],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 300,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "fld_srag0078",
+      "_type": "request_group",
+      "parentId": "wrk_sraglagarto",
+      "name": "Admin",
+      "description": "Requer ADMIN_TOKEN no .env da API e a variável admin_token no ambiente do Insomnia",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -5000,
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0079",
+      "_type": "request",
+      "parentId": "fld_srag0078",
+      "name": "Sincronizar (só anos com arquivo novo)",
+      "description": "",
+      "method": "POST",
+      "url": "{{ _.base_url }}/v1/admin/sincronizar",
+      "parameters": [],
+      "headers": [
+        {
+          "id": "pair_srag0080",
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"forcar\": false\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}",
+        "prefix": ""
+      },
+      "metaSortKey": 0,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0081",
+      "_type": "request",
+      "parentId": "fld_srag0078",
+      "name": "Sincronizar forçado (reimporta tudo)",
+      "description": "",
+      "method": "POST",
+      "url": "{{ _.base_url }}/v1/admin/sincronizar",
+      "parameters": [],
+      "headers": [
+        {
+          "id": "pair_srag0082",
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"forcar\": true\n}"
+      },
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}",
+        "prefix": ""
+      },
+      "metaSortKey": 100,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "fld_srag0083",
+      "_type": "request_group",
+      "parentId": "wrk_sraglagarto",
+      "name": "Exemplos de erro",
+      "description": "Para ver o formato padronizado de erro",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -6000,
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0084",
+      "_type": "request",
+      "parentId": "fld_srag0083",
+      "name": "400 — parâmetro inválido",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/casos",
+      "parameters": [
+        {
+          "id": "pair_srag0085",
+          "name": "evolucao",
+          "value": "morreu",
+          "disabled": false
+        },
+        {
+          "id": "pair_srag0086",
+          "name": "limite",
+          "value": "500",
+          "disabled": false
+        }
+      ],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 0,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0087",
+      "_type": "request",
+      "parentId": "fld_srag0083",
+      "name": "404 — caso inexistente",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/casos/1",
+      "parameters": [],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 100,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0088",
+      "_type": "request",
+      "parentId": "fld_srag0083",
+      "name": "404 — rota inexistente",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/cases-day",
+      "parameters": [],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 200,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    },
+    {
+      "_id": "req_srag0089",
+      "_type": "request",
+      "parentId": "fld_srag0083",
+      "name": "401 — admin sem token",
+      "description": "",
+      "method": "POST",
+      "url": "{{ _.base_url }}/v1/admin/sincronizar",
+      "parameters": [],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 300,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793810402517,
+      "modified": 1793810402517
+    }
+  ]
+}

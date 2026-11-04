@@ -1,19 +1,34 @@
-import express from 'express'
-import router from './routes'
-import swaggerUi from 'swagger-ui-express'
-import swaggerFile from './swagger.json'
-import connectDatabase from './Database/database'
-import cors from 'cors'
-import dotenv from 'dotenv'
+import { criarApp } from './app'
+import { criarContainer } from './container'
 
-dotenv.config();
+async function main() {
+  const deps = criarContainer()
+  const { config, logger, sync } = deps
 
-const app = express();
-app.use(express.json());
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile))
-app.use(cors());
-app.use(router);
+  const carregados = await sync.carregarCache()
+  logger.info({ anos: config.anos, anosEmCache: carregados }, 'Dados locais carregados')
 
-connectDatabase();
+  const app = criarApp(deps)
+  const server = app.listen(config.port, () => {
+    logger.info(`API SRAG ${config.municipio.nome}-${config.municipio.uf} em http://localhost:${config.port} (docs em /docs)`)
+  })
 
-app.listen(3333);
+  if (config.syncAoIniciar) {
+    sync.sincronizar().catch((erro) => logger.error({ err: erro }, 'Falha na sincronização inicial'))
+  }
+  sync.agendar()
+
+  const encerrar = (sinal: string) => {
+    logger.info({ sinal }, 'Encerrando servidor')
+    sync.parar()
+    server.close(() => process.exit(0))
+    setTimeout(() => process.exit(0), 10_000).unref()
+  }
+  process.on('SIGINT', () => encerrar('SIGINT'))
+  process.on('SIGTERM', () => encerrar('SIGTERM'))
+}
+
+main().catch((erro) => {
+  console.error(erro)
+  process.exit(1)
+})
