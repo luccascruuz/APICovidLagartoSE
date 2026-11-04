@@ -66,7 +66,9 @@ Outros comandos:
 | GET | `/v1/srag/semanas` | Série por semana epidemiológica, com média móvel (`janela`) |
 | GET | `/v1/srag/dicionario` | Significado de cada valor usado nas respostas |
 | GET | `/v1/fonte` | Arquivo usado para cada ano, data de publicação e status da sincronização |
-| GET | `/health` | Saúde da API |
+| GET | `/health` | Saúde da API: `200` se ok ou degradada, `503` se indisponível |
+| GET | `/status` | Página de status (HTML) com dados, sincronização e métricas |
+| GET | `/status.json` | As mesmas informações de `/status`, em JSON |
 | POST | `/v1/admin/sincronizar` | Força a sincronização (requer `Authorization: Bearer <ADMIN_TOKEN>`) |
 
 Filtros aceitos em `/casos`, `/resumo` e, em parte, em `/semanas`:
@@ -111,6 +113,55 @@ Erros seguem sempre o mesmo formato:
 { "erro": { "codigo": "PARAMETROS_INVALIDOS", "mensagem": "...", "detalhes": [] } }
 ```
 
+## Observabilidade
+
+### Página de status
+
+Abra **http://localhost:3333/status** no navegador. A página recarrega sozinha a cada 30 s e mostra:
+
+- **Saúde:** *Operacional*, *Degradado* ou *Indisponível*, com o motivo.
+- **Dados carregados:** arquivo do Ministério usado em cada ano, data de publicação, data de importação e número de casos.
+- **Sincronização:** resultado da última execução por ano, último sucesso e próxima verificação.
+- **Requisições por rota:** total, erros 4xx e 5xx, tempo médio e p95.
+- **Processo:** tempo no ar e memória.
+- **Monitoramento externo:** quais integrações estão ativas.
+
+Para usar em scripts, as mesmas informações saem em JSON em `/status.json`.
+
+As métricas ficam em memória e zeram quando o servidor reinicia. Para histórico, use os serviços abaixo.
+
+### Regras do `/health`
+
+| Status | HTTP | Quando |
+|---|---|---|
+| `ok` | 200 | Dados carregados e sincronização em dia |
+| `degradado` | 200 | A última sincronização falhou, mas ainda há uma bem-sucedida dentro do limite. Os dados servidos continuam válidos |
+| `indisponivel` | 503 | Nenhum dado carregado, ou nenhuma sincronização bem-sucedida há mais de `SAUDE_MAX_HORAS_SEM_SYNC` horas (padrão: 36) |
+
+O limite padrão de 36 h, com sincronização a cada 12 h, tolera duas falhas seguidas do OpenDataSUS antes de acusar indisponibilidade. Com `SYNC_INTERVALO_HORAS=0`, o prazo de sincronização não é cobrado.
+
+### Alertas externos (gratuitos e opcionais)
+
+Todos são opcionais: sem as variáveis no `.env`, a API funciona igual.
+
+**UptimeRobot ou Better Stack (API fora do ar).** Não exige código.
+1. Crie um monitor HTTP para `https://<seu-domínio>/health`.
+2. Configure o alerta para qualquer resposta diferente de 2xx.
+
+O serviço precisa alcançar a API, então só funciona com ela hospedada num endereço público.
+
+**Healthchecks.io (sincronização parou).**
+1. Crie um check com *Period* igual a `SYNC_INTERVALO_HORAS` (ex.: 12 h) e *Grace* de cerca de 1 h.
+2. Copie a URL de ping para `HEALTHCHECKS_URL`.
+
+A cada sincronização, a API avisa o início (`/start`), o sucesso ou a falha (`/fail`), com o resultado de cada ano no corpo. Você recebe alerta se a sincronização falhar ou se parar de rodar. Funciona mesmo com a API rodando só localmente, porque é ela que chama o serviço.
+
+**Sentry (erros).**
+1. Crie um projeto Node.js.
+2. Copie o DSN para `SENTRY_DSN`.
+
+São enviados os erros 500 (com método e rota) e as falhas de sincronização. Erros de validação (400) e de recurso inexistente (404) não são enviados.
+
 ## Configuração (`.env`)
 
 Veja todas as opções comentadas em [.env.example](.env.example). As principais:
@@ -122,6 +173,9 @@ Veja todas as opções comentadas em [.env.example](.env.example). As principais
 | `ANOS` | ano atual e anterior | Ex.: `2019-2026` ou `2024,2025,2026` |
 | `SYNC_INTERVALO_HORAS` | `12` | Intervalo para procurar arquivos novos (`0` desativa) |
 | `ADMIN_TOKEN` | vazio | Habilita `POST /v1/admin/sincronizar` (mínimo de 24 caracteres) |
+| `SAUDE_MAX_HORAS_SEM_SYNC` | `36` | Horas sem sincronização bem-sucedida até `/health` responder 503 |
+| `HEALTHCHECKS_URL` | vazio | URL de ping do Healthchecks.io |
+| `SENTRY_DSN` | vazio | DSN do projeto no Sentry |
 
 ## Sobre os dados
 
@@ -146,7 +200,13 @@ src/
 │   ├── srag.schemas.ts           # validação dos parâmetros
 │   ├── srag.controller.ts
 │   └── srag.routes.ts
-├── modules/sistema/              # /health, /v1/fonte, /v1/admin
+├── modules/sistema/              # /health, /status, /v1/fonte, /v1/admin
+├── observability/
+│   ├── metricas.ts               # contadores e tempo de resposta por rota
+│   ├── saude.ts                  # regras de ok / degradado / indisponível
+│   ├── status.ts                 # página /status
+│   ├── monitoramento.ts          # Healthchecks.io e envio de erros
+│   └── sentry.ts                 # integração com o Sentry
 ├── ingestion/
 │   ├── opendatasus.client.ts     # descobre e baixa os CSVs
 │   ├── csv-ingestor.ts           # leitura em streaming + filtro do município

@@ -11,6 +11,10 @@ const booleanString = z
   .optional()
   .transform((v) => v === 'true' || v === '1')
 
+function opcional<T extends z.ZodType>(schema: T) {
+  return z.preprocess((v) => (v === '' ? undefined : v), schema.optional())
+}
+
 const anoAtual = new Date().getUTCFullYear()
 
 export function parseAnos(valor: string | undefined, referencia = anoAtual): number[] {
@@ -65,6 +69,10 @@ const schema = z.object({
     .refine((v) => v === undefined || v.length >= 24, 'ADMIN_TOKEN deve ter pelo menos 24 caracteres'),
   CORS_ORIGIN: z.string().default('*'),
   RATE_LIMIT_POR_MINUTO: z.coerce.number().int().min(0).default(120),
+
+  SAUDE_MAX_HORAS_SEM_SYNC: z.coerce.number().min(1).default(36),
+  HEALTHCHECKS_URL: opcional(z.url({ protocol: /^https?$/ })),
+  SENTRY_DSN: opcional(z.url()),
 })
 
 function carregar() {
@@ -91,6 +99,9 @@ function carregar() {
     adminToken: env.ADMIN_TOKEN,
     corsOrigin: env.CORS_ORIGIN === '*' ? '*' : env.CORS_ORIGIN.split(',').map((o) => o.trim()),
     rateLimitPorMinuto: env.RATE_LIMIT_POR_MINUTO,
+    saudeMaxHorasSemSync: env.SAUDE_MAX_HORAS_SEM_SYNC,
+    healthchecksUrl: env.HEALTHCHECKS_URL?.replace(/\/+$/, ''),
+    sentryDsn: env.SENTRY_DSN,
   }
 }
 

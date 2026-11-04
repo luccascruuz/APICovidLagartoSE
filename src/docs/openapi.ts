@@ -214,7 +214,32 @@ export function criarOpenApi(config: Config) {
         },
       },
       '/health': {
-        get: { tags: ['Sistema'], summary: 'Verificação de saúde', responses: { '200': { description: 'API no ar' } } },
+        get: {
+          tags: ['Sistema'],
+          summary: 'Verificação de saúde (para monitores de uptime)',
+          description:
+            '`ok`: tudo certo. `degradado`: a última sincronização falhou, mas os dados ainda estão dentro do prazo. ' +
+            '`indisponivel` (HTTP 503): sem dados carregados ou sem sincronização bem-sucedida há mais de `SAUDE_MAX_HORAS_SEM_SYNC` horas.',
+          responses: {
+            '200': { description: 'ok ou degradado' },
+            '503': { description: 'indisponível' },
+          },
+        },
+      },
+      '/status': {
+        get: {
+          tags: ['Sistema'],
+          summary: 'Página de status (HTML)',
+          description: 'Saúde, dados carregados, sincronização, requisições por rota, tempo de resposta e memória. Recarrega a cada 30 s.',
+          responses: { '200': { description: 'Página HTML', content: { 'text/html': {} } } },
+        },
+      },
+      '/status.json': {
+        get: {
+          tags: ['Sistema'],
+          summary: 'Mesmas informações da página de status, em JSON',
+          responses: { '200': { description: 'Status e métricas' } },
+        },
       },
       '/v1/admin/sincronizar': {
         post: {

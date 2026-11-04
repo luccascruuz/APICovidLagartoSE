@@ -2,6 +2,10 @@ import { createHash, timingSafeEqual } from 'node:crypto'
 import { Router, type RequestHandler } from 'express'
 import type { Config } from '../../config/env'
 import type { SyncService } from '../../ingestion/sync.service'
+import type { Metricas } from '../../observability/metricas'
+import type { Monitoramento } from '../../observability/monitoramento'
+import { avaliarSaude } from '../../observability/saude'
+import { renderizarStatus, type StatusApi } from '../../observability/status'
 import { AppError } from '../../shared/errors'
 import { sincronizarSchema } from '../srag/srag.schemas'
 import type { SragService } from '../srag/srag.service'
@@ -12,12 +16,52 @@ function tokensIguais(recebido: string, esperado: string): boolean {
   return timingSafeEqual(a, b)
 }
 
-export function sistemaRoutes(deps: { config: Config; sync: SyncService; service: SragService }): Router {
-  const { config, sync, service } = deps
+export interface SistemaDeps {
+  config: Config
+  sync: SyncService
+  service: SragService
+  metricas: Metricas
+  monitoramento: Monitoramento
+  inicioProcesso: Date
+}
+
+export function sistemaRoutes(deps: SistemaDeps): Router {
+  const { config, sync, service, metricas, monitoramento, inicioProcesso } = deps
   const router = Router()
 
+  const saude = () =>
+    avaliarSaude({
+      dadosCarregados: sync.pronto,
+      sincronizacao: sync.status,
+      intervaloHoras: config.syncIntervaloHoras,
+      maxHorasSemSync: config.saudeMaxHorasSemSync,
+      inicioProcesso,
+    })
+
+  const status = async (): Promise<StatusApi> => ({
+    geradoEm: new Date().toISOString(),
+    municipio: config.municipio,
+    saude: saude(),
+    dados: await service.fontes(),
+    sincronizacao: { ...sync.status, intervaloHoras: config.syncIntervaloHoras },
+    integracoes: monitoramento.integracoes,
+    metricas: metricas.snapshot(),
+  })
+
   router.get('/health', (_req, res) => {
-    res.json({ status: 'ok', dadosCarregados: sync.pronto, sincronizacaoEmAndamento: sync.emAndamento })
+    const resultado = saude()
+    res.setHeader('Cache-Control', 'no-store')
+    res.status(resultado.status === 'indisponivel' ? 503 : 200).json(resultado)
+  })
+
+  router.get('/status.json', async (_req, res) => {
+    res.setHeader('Cache-Control', 'no-store')
+    res.json(await status())
+  })
+
+  router.get('/status', async (_req, res) => {
+    res.setHeader('Cache-Control', 'no-store')
+    res.type('html').send(renderizarStatus(await status()))
   })
 
   router.get('/v1/fonte', async (_req, res) => {

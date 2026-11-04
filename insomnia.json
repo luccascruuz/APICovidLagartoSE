@@ -1,7 +1,7 @@
 {
   "_type": "export",
   "__export_format": 4,
-  "__export_date": "2026-11-04T16:40:02.517Z",
+  "__export_date": "2026-11-04T17:17:03.038Z",
   "__export_source": "api-srag-lagarto-se",
   "resources": [
     {
@@ -11,8 +11,8 @@
       "name": "API SRAG Lagarto-SE",
       "description": "Casos de SRAG de Lagarto-SE (SIVEP-Gripe / OpenDataSUS). Docs: {{ _.base_url }}/docs",
       "scope": "collection",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "env_sraglagarto_base",
@@ -24,8 +24,8 @@
       "color": null,
       "isPrivate": false,
       "metaSortKey": 1,
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "env_sraglagarto_local",
@@ -35,8 +35,8 @@
       "color": "#7d69cb",
       "isPrivate": false,
       "metaSortKey": 2,
-      "created": 1793810402517,
-      "modified": 1793810402517,
+      "created": 1793812623038,
+      "modified": 1793812623038,
       "data": {
         "base_url": "http://localhost:3333",
         "admin_token": "cole-aqui-o-ADMIN_TOKEN-do-seu-.env",
@@ -61,8 +61,8 @@
       "environment": {},
       "environmentPropertyOrder": null,
       "metaSortKey": -1000,
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0002",
@@ -175,8 +175,8 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0018",
@@ -211,8 +211,8 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0021",
@@ -241,8 +241,8 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0023",
@@ -277,8 +277,8 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0026",
@@ -313,8 +313,8 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0029",
@@ -343,8 +343,8 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0031",
@@ -385,8 +385,8 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0035",
@@ -427,8 +427,8 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0039",
@@ -450,8 +450,8 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "fld_srag0040",
@@ -462,8 +462,8 @@
       "environment": {},
       "environmentPropertyOrder": null,
       "metaSortKey": -2000,
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0041",
@@ -558,8 +558,8 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0054",
@@ -588,8 +588,8 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0056",
@@ -618,8 +618,8 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0058",
@@ -648,8 +648,8 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "fld_srag0060",
@@ -660,8 +660,8 @@
       "environment": {},
       "environmentPropertyOrder": null,
       "metaSortKey": -3000,
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0061",
@@ -696,8 +696,8 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0064",
@@ -732,8 +732,8 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0067",
@@ -768,8 +768,8 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0070",
@@ -804,27 +804,27 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "fld_srag0073",
       "_type": "request_group",
       "parentId": "wrk_sraglagarto",
       "name": "Sistema",
-      "description": "Saúde, origem dos dados e documentação",
+      "description": "Saúde, status, origem dos dados e documentação",
       "environment": {},
       "environmentPropertyOrder": null,
       "metaSortKey": -4000,
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0074",
       "_type": "request",
       "parentId": "fld_srag0073",
       "name": "Health",
-      "description": "",
+      "description": "200 = ok ou degradado; 503 = indisponível. É a rota para monitores de uptime.",
       "method": "GET",
       "url": "{{ _.base_url }}/health",
       "parameters": [],
@@ -839,17 +839,17 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0075",
       "_type": "request",
       "parentId": "fld_srag0073",
-      "name": "Fonte dos dados e status da sincronização",
-      "description": "",
+      "name": "Status (JSON)",
+      "description": "Saúde, dados, sincronização e métricas por rota. A versão HTML fica em {{ _.base_url }}/status — abra no navegador.",
       "method": "GET",
-      "url": "{{ _.base_url }}/v1/fonte",
+      "url": "{{ _.base_url }}/status.json",
       "parameters": [],
       "headers": [],
       "body": {},
@@ -862,17 +862,17 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0076",
       "_type": "request",
       "parentId": "fld_srag0073",
-      "name": "Dicionário de valores",
-      "description": "",
+      "name": "Status (página HTML)",
+      "description": "Melhor visualizada no navegador.",
       "method": "GET",
-      "url": "{{ _.base_url }}/v1/srag/dicionario",
+      "url": "{{ _.base_url }}/status",
       "parameters": [],
       "headers": [],
       "body": {},
@@ -885,17 +885,17 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
       "_id": "req_srag0077",
       "_type": "request",
       "parentId": "fld_srag0073",
-      "name": "OpenAPI (JSON)",
+      "name": "Fonte dos dados e status da sincronização",
       "description": "",
       "method": "GET",
-      "url": "{{ _.base_url }}/openapi.json",
+      "url": "{{ _.base_url }}/v1/fonte",
       "parameters": [],
       "headers": [],
       "body": {},
@@ -908,11 +908,57 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
-      "_id": "fld_srag0078",
+      "_id": "req_srag0078",
+      "_type": "request",
+      "parentId": "fld_srag0073",
+      "name": "Dicionário de valores",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/v1/srag/dicionario",
+      "parameters": [],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 400,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793812623038,
+      "modified": 1793812623038
+    },
+    {
+      "_id": "req_srag0079",
+      "_type": "request",
+      "parentId": "fld_srag0073",
+      "name": "OpenAPI (JSON)",
+      "description": "",
+      "method": "GET",
+      "url": "{{ _.base_url }}/openapi.json",
+      "parameters": [],
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": 500,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "created": 1793812623038,
+      "modified": 1793812623038
+    },
+    {
+      "_id": "fld_srag0080",
       "_type": "request_group",
       "parentId": "wrk_sraglagarto",
       "name": "Admin",
@@ -920,13 +966,13 @@
       "environment": {},
       "environmentPropertyOrder": null,
       "metaSortKey": -5000,
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
-      "_id": "req_srag0079",
+      "_id": "req_srag0081",
       "_type": "request",
-      "parentId": "fld_srag0078",
+      "parentId": "fld_srag0080",
       "name": "Sincronizar (só anos com arquivo novo)",
       "description": "",
       "method": "POST",
@@ -934,7 +980,7 @@
       "parameters": [],
       "headers": [
         {
-          "id": "pair_srag0080",
+          "id": "pair_srag0082",
           "name": "Content-Type",
           "value": "application/json"
         }
@@ -956,13 +1002,13 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
-      "_id": "req_srag0081",
+      "_id": "req_srag0083",
       "_type": "request",
-      "parentId": "fld_srag0078",
+      "parentId": "fld_srag0080",
       "name": "Sincronizar forçado (reimporta tudo)",
       "description": "",
       "method": "POST",
@@ -970,7 +1016,7 @@
       "parameters": [],
       "headers": [
         {
-          "id": "pair_srag0082",
+          "id": "pair_srag0084",
           "name": "Content-Type",
           "value": "application/json"
         }
@@ -992,11 +1038,11 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
-      "_id": "fld_srag0083",
+      "_id": "fld_srag0085",
       "_type": "request_group",
       "parentId": "wrk_sraglagarto",
       "name": "Exemplos de erro",
@@ -1004,26 +1050,26 @@
       "environment": {},
       "environmentPropertyOrder": null,
       "metaSortKey": -6000,
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
-      "_id": "req_srag0084",
+      "_id": "req_srag0086",
       "_type": "request",
-      "parentId": "fld_srag0083",
+      "parentId": "fld_srag0085",
       "name": "400 — parâmetro inválido",
       "description": "",
       "method": "GET",
       "url": "{{ _.base_url }}/v1/srag/casos",
       "parameters": [
         {
-          "id": "pair_srag0085",
+          "id": "pair_srag0087",
           "name": "evolucao",
           "value": "morreu",
           "disabled": false
         },
         {
-          "id": "pair_srag0086",
+          "id": "pair_srag0088",
           "name": "limite",
           "value": "500",
           "disabled": false
@@ -1040,13 +1086,13 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
-      "_id": "req_srag0087",
+      "_id": "req_srag0089",
       "_type": "request",
-      "parentId": "fld_srag0083",
+      "parentId": "fld_srag0085",
       "name": "404 — caso inexistente",
       "description": "",
       "method": "GET",
@@ -1063,13 +1109,13 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
-      "_id": "req_srag0088",
+      "_id": "req_srag0090",
       "_type": "request",
-      "parentId": "fld_srag0083",
+      "parentId": "fld_srag0085",
       "name": "404 — rota inexistente",
       "description": "",
       "method": "GET",
@@ -1086,13 +1132,13 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     },
     {
-      "_id": "req_srag0089",
+      "_id": "req_srag0091",
       "_type": "request",
-      "parentId": "fld_srag0083",
+      "parentId": "fld_srag0085",
       "name": "401 — admin sem token",
       "description": "",
       "method": "POST",
@@ -1109,8 +1155,8 @@
       "settingEncodeUrl": true,
       "settingRebuildPath": true,
       "settingFollowRedirects": "global",
-      "created": 1793810402517,
-      "modified": 1793810402517
+      "created": 1793812623038,
+      "modified": 1793812623038
     }
   ]
 }

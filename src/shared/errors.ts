@@ -20,7 +20,10 @@ export const rotaNaoEncontrada: RequestHandler = (req, _res, next) => {
   next(new AppError(404, 'ROTA_NAO_ENCONTRADA', `Rota ${req.method} ${req.path} não existe. Veja /docs.`))
 }
 
-export function tratadorDeErros(logger: Logger): ErrorRequestHandler {
+export function tratadorDeErros(
+  logger: Logger,
+  aoErroInterno: (erro: unknown, contexto: Record<string, unknown>) => void = () => undefined,
+): ErrorRequestHandler {
   return (err, req, res, _next) => {
     if (err instanceof ZodError) {
       res.status(400).json({
@@ -46,6 +49,7 @@ export function tratadorDeErros(logger: Logger): ErrorRequestHandler {
     }
 
     logger.error({ err, metodo: req.method, rota: req.originalUrl }, 'Erro não tratado')
+    aoErroInterno(err, { metodo: req.method, rota: req.originalUrl })
     res.status(500).json({ erro: { codigo: 'ERRO_INTERNO', mensagem: 'Erro interno do servidor' } })
   }
 }

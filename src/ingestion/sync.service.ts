@@ -1,3 +1,4 @@
+import { monitoramentoNulo, type Monitoramento } from '../observability/monitoramento'
 import type { Logger } from '../shared/logger'
 import type { FonteAno, SragRepository } from '../modules/srag/srag.repository'
 import { filtrarMunicipio } from './csv-ingestor'
@@ -21,6 +22,7 @@ export interface StatusSincronizacao {
     sucesso: boolean
     anos: ResultadoAno[]
   } | null
+  ultimoSucessoEm: string | null
   proximaExecucao: string | null
 }
 
@@ -38,6 +40,7 @@ export class SyncService {
     emAndamento: false,
     iniciadaEm: null,
     ultimaExecucao: null,
+    ultimoSucessoEm: null,
     proximaExecucao: null,
   }
 
@@ -47,6 +50,7 @@ export class SyncService {
     private readonly cache: FileCache,
     private readonly opcoes: SyncOptions,
     private readonly logger: Logger,
+    private readonly monitoramento: Monitoramento = monitoramentoNulo,
   ) {}
 
   get status(): StatusSincronizacao {
@@ -109,6 +113,7 @@ export class SyncService {
     this.estado.emAndamento = true
     this.estado.iniciadaEm = iniciadaEm
     this.logger.info({ anos: this.opcoes.anos, forcar }, 'Sincronização iniciada')
+    this.monitoramento.sincronizacaoIniciada()
 
     const resultados: ResultadoAno[] = []
     try {
@@ -172,13 +177,12 @@ export class SyncService {
       this.estado.iniciadaEm = null
     }
 
-    this.estado.ultimaExecucao = {
-      iniciadaEm,
-      finalizadaEm: new Date().toISOString(),
-      sucesso: resultados.every((r) => r.situacao !== 'erro'),
-      anos: resultados,
-    }
+    const finalizadaEm = new Date().toISOString()
+    const sucesso = resultados.every((r) => r.situacao !== 'erro')
+    this.estado.ultimaExecucao = { iniciadaEm, finalizadaEm, sucesso, anos: resultados }
+    if (sucesso) this.estado.ultimoSucessoEm = finalizadaEm
     this.logger.info({ resultados }, 'Sincronização finalizada')
+    this.monitoramento.sincronizacaoFinalizada(resultados)
     return resultados
   }
 }

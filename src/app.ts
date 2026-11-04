@@ -6,6 +6,8 @@ import swaggerUi from 'swagger-ui-express'
 import type { Config } from './config/env'
 import { criarOpenApi } from './docs/openapi'
 import type { SyncService } from './ingestion/sync.service'
+import { Metricas } from './observability/metricas'
+import { monitoramentoNulo, type Monitoramento } from './observability/monitoramento'
 import { sistemaRoutes } from './modules/sistema/sistema.routes'
 import { SragController } from './modules/srag/srag.controller'
 import { sragRoutes } from './modules/srag/srag.routes'
@@ -18,9 +20,17 @@ export interface AppDeps {
   logger: Logger
   service: SragService
   sync: SyncService
+  monitoramento?: Monitoramento
+  metricas?: Metricas
+  inicioProcesso?: Date
 }
 
-export function criarApp({ config, logger, service, sync }: AppDeps): Express {
+export function criarApp(deps: AppDeps): Express {
+  const { config, logger, service, sync } = deps
+  const monitoramento = deps.monitoramento ?? monitoramentoNulo
+  const inicioProcesso = deps.inicioProcesso ?? new Date()
+  const metricas = deps.metricas ?? new Metricas(inicioProcesso)
+
   const app = express()
   app.disable('x-powered-by')
   app.set('query parser', 'extended')
@@ -28,6 +38,7 @@ export function criarApp({ config, logger, service, sync }: AppDeps): Express {
   app.use(helmet())
   app.use(cors({ origin: config.corsOrigin, methods: ['GET', 'POST'] }))
   app.use(express.json({ limit: '10kb' }))
+  app.use(metricas.middleware())
 
   app.use((req, res, next) => {
     const inicio = process.hrtime.bigint()
@@ -64,10 +75,10 @@ export function criarApp({ config, logger, service, sync }: AppDeps): Express {
     res.redirect('/docs')
   })
 
-  app.use(sistemaRoutes({ config, sync, service }))
+  app.use(sistemaRoutes({ config, sync, service, metricas, monitoramento, inicioProcesso }))
   app.use('/v1/srag', sragRoutes(new SragController(service), () => sync.pronto))
 
   app.use(rotaNaoEncontrada)
-  app.use(tratadorDeErros(logger))
+  app.use(tratadorDeErros(logger, (erro, contexto) => monitoramento.erro(erro, contexto)))
   return app
 }
