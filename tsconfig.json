@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "target": "es2023",
-    "lib": ["es2023"],
+    "lib": [
+      "es2023"
+    ],
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "rootDir": ".",
@@ -14,8 +16,12 @@
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "sourceMap": true,
-    "types": ["node"]
+    "sourceMap": true
   },
-  "include": ["index.ts", "src/**/*", "tests/**/*", "vitest.config.mts"]
+  "include": [
+    "index.ts",
+    "src/**/*",
+    "tests/**/*",
+    "vitest.config.mts"
+  ]
 }

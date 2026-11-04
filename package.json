@@ -7,7 +7,7 @@
   "author": "Luccas Ribeiro Cruz",
   "main": "build/server.js",
   "engines": {
-    "node": ">=20.12"
+    "node": "24.x"
   },
   "scripts": {
     "dev": "tsx watch src/server.ts",
