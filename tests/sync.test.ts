@@ -14,7 +14,7 @@ describe('SyncService', () => {
 
     const primeira = await amb.sync.sincronizar()
     expect(primeira).toEqual([{ ano: 2026, situacao: 'atualizado', arquivo: 'INFLUD26-02-11-2026.csv', totalCasos: 4 }])
-    expect(amb.sync.pronto).toBe(true)
+    expect(await amb.estado.pronto()).toBe(true)
 
     const [fonte] = await amb.repository.fontes()
     expect(fonte).toMatchObject({ ano: 2026, publicadoEm: '2026-11-02', linhasLidas: 6, totalCasos: 4, linhasDescartadas: 1 })
@@ -34,7 +34,7 @@ describe('SyncService', () => {
 
     const reinicio = await criarAmbiente({ config: { dataDir: amb.config.dataDir } })
     expect(await reinicio.sync.carregarCache()).toBe(1)
-    expect(reinicio.sync.pronto).toBe(true)
+    expect(await reinicio.estado.pronto()).toBe(true)
     expect((await reinicio.repository.listar({})).length).toBe(4)
   })
 
@@ -64,7 +64,7 @@ describe('SyncService', () => {
     const resultado = await amb.sync.sincronizar()
     expect(resultado[0]).toMatchObject({ ano: 2026, situacao: 'erro' })
     expect(amb.sync.status.ultimaExecucao?.sucesso).toBe(false)
-    expect(amb.sync.pronto).toBe(false)
+    expect(await amb.estado.pronto()).toBe(false)
   })
 
   it('aponta ano ausente no OpenDataSUS', async () => {

@@ -13,7 +13,6 @@ export interface Saude {
 export interface EntradaSaude {
   dadosCarregados: boolean
   sincronizacao: StatusSincronizacao
-  intervaloHoras: number
   maxHorasSemSync: number
   inicioProcesso: Date
   agora?: Date
@@ -33,7 +32,7 @@ export function avaliarSaude(e: EntradaSaude): Saude {
     )
   }
 
-  if (e.intervaloHoras > 0) {
+  if (e.maxHorasSemSync > 0) {
     const referencia = e.sincronizacao.ultimoSucessoEm ? new Date(e.sincronizacao.ultimoSucessoEm) : e.inicioProcesso
     const horas = (agora.getTime() - referencia.getTime()) / HORA_MS
     if (horas > e.maxHorasSemSync) {

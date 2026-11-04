@@ -1,4 +1,4 @@
-import type { Readable } from 'node:stream'
+import { pipeline, type Readable } from 'node:stream'
 import { parse } from 'csv-parse'
 import { COLUNAS_OBRIGATORIAS, LinhaInvalidaError, mapearLinha } from '../modules/srag/srag.mapper'
 import type { CasoSrag } from '../modules/srag/srag.types'
@@ -13,15 +13,14 @@ export async function filtrarMunicipio(
   entrada: Readable,
   opcoes: { codigoIbge: string; anoArquivo: number; aoProgredir?: (linhasLidas: number) => void },
 ): Promise<ResultadoIngestao> {
-  const parser = entrada.pipe(
-    parse({
-      delimiter: ';',
-      bom: true,
-      relax_column_count: true,
-      relax_quotes: true,
-      trim: true,
-    }),
-  )
+  const parser = parse({
+    delimiter: ';',
+    bom: true,
+    relax_column_count: true,
+    relax_quotes: true,
+    trim: true,
+  })
+  pipeline(entrada, parser, () => undefined)
 
   let cabecalho: string[] | null = null
   let indiceMunicipio = -1

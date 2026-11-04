@@ -2,10 +2,11 @@ import cors from 'cors'
 import express, { type Express } from 'express'
 import rateLimit from 'express-rate-limit'
 import helmet from 'helmet'
-import swaggerUi from 'swagger-ui-express'
 import type { Config } from './config/env'
 import { criarOpenApi } from './docs/openapi'
+import { swaggerUiRoutes } from './docs/swagger-ui'
 import type { SyncService } from './ingestion/sync.service'
+import type { EstadoDados } from './modules/sistema/estado-dados'
 import { Metricas } from './observability/metricas'
 import { monitoramentoNulo, type Monitoramento } from './observability/monitoramento'
 import { sistemaRoutes } from './modules/sistema/sistema.routes'
@@ -19,20 +20,22 @@ export interface AppDeps {
   config: Config
   logger: Logger
   service: SragService
-  sync: SyncService
+  estado: EstadoDados
+  sync?: SyncService
   monitoramento?: Monitoramento
   metricas?: Metricas
   inicioProcesso?: Date
 }
 
 export function criarApp(deps: AppDeps): Express {
-  const { config, logger, service, sync } = deps
+  const { config, logger, service, estado, sync } = deps
   const monitoramento = deps.monitoramento ?? monitoramentoNulo
   const inicioProcesso = deps.inicioProcesso ?? new Date()
   const metricas = deps.metricas ?? new Metricas(inicioProcesso)
 
   const app = express()
   app.disable('x-powered-by')
+  if (config.trustProxy !== false) app.set('trust proxy', config.trustProxy)
   app.set('query parser', 'extended')
 
   app.use(helmet())
@@ -70,13 +73,13 @@ export function criarApp(deps: AppDeps): Express {
   app.get('/openapi.json', (_req, res) => {
     res.json(openApi)
   })
-  app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApi, { customSiteTitle: 'API SRAG Lagarto-SE' }))
+  app.use('/docs', swaggerUiRoutes(`API SRAG ${config.municipio.nome}-${config.municipio.uf}`))
   app.get('/', (_req, res) => {
     res.redirect('/docs')
   })
 
-  app.use(sistemaRoutes({ config, sync, service, metricas, monitoramento, inicioProcesso }))
-  app.use('/v1/srag', sragRoutes(new SragController(service), () => sync.pronto))
+  app.use(sistemaRoutes({ config, estado, sync, service, metricas, monitoramento, inicioProcesso }))
+  app.use('/v1/srag', sragRoutes(new SragController(service), () => estado.pronto()))
 
   app.use(rotaNaoEncontrada)
   app.use(tratadorDeErros(logger, (erro, contexto) => monitoramento.erro(erro, contexto)))

@@ -137,7 +137,16 @@ describe('rotas de sistema', () => {
     expect((await request(amb.app).get('/docs/')).status).toBe(200)
   })
 
-  it('404 padronizado para rota inexistente', async () => {
+  it('/docs carrega o Swagger UI do CDN com integridade, liberando só esse CDN', async () => {
+    const docs = await request(amb.app).get('/docs/')
+    expect(docs.text).toMatch(/swagger-ui-bundle\.js" integrity="sha384-/)
+    expect(docs.headers['content-security-policy']).toContain("script-src 'self' https://cdn.jsdelivr.net")
+    expect((await request(amb.app).get('/docs/iniciar.js')).text).toContain("url: '/openapi.json'")
+    const status = await request(amb.app).get('/status')
+    expect(status.headers['content-security-policy']).toContain("script-src 'self';")
+  })
+
+    it('404 padronizado para rota inexistente', async () => {
     const res = await request(amb.app).get('/cases-day')
     expect(res.status).toBe(404)
     expect(res.body.erro.codigo).toBe('ROTA_NAO_ENCONTRADA')

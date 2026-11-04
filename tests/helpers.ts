@@ -8,6 +8,7 @@ import { config as configBase, type Config } from '../src/config/env'
 import { FileCache } from '../src/ingestion/file-cache'
 import { OpenDataSusClient } from '../src/ingestion/opendatasus.client'
 import { SyncService } from '../src/ingestion/sync.service'
+import { EstadoDados } from '../src/modules/sistema/estado-dados'
 import { InMemorySragRepository, type SragRepository } from '../src/modules/srag/srag.repository'
 import { SragService } from '../src/modules/srag/srag.service'
 import type { Monitoramento } from '../src/observability/monitoramento'
@@ -32,6 +33,8 @@ export interface OpcoesAmbiente {
   repository?: SragRepository
   monitoramento?: Monitoramento
   inicioProcesso?: Date
+  semCacheEmArquivo?: boolean
+  semSincronizacao?: boolean
 }
 
 export async function criarAmbiente(opcoes: OpcoesAmbiente = {}) {
@@ -39,28 +42,31 @@ export async function criarAmbiente(opcoes: OpcoesAmbiente = {}) {
   const config: Config = { ...configBase, anos: [2026], dataDir, rateLimitPorMinuto: 0, ...opcoes.config }
   const fetchFn = opcoes.fetch ?? criarFetchFalso()
   const repository = opcoes.repository ?? new InMemorySragRepository()
-  const cache = new FileCache(config.dataDir)
+  const cache = opcoes.semCacheEmArquivo ? null : new FileCache(config.dataDir)
   const sync = new SyncService(
     repository,
     new OpenDataSusClient(config.datasetUrl, fetchFn),
     cache,
-    { anos: config.anos, municipioIbge: config.municipio.codigoIbge, intervaloHoras: 0 },
+    { anos: config.anos, municipioIbge: config.municipio.codigoIbge, intervaloHoras: 0, origem: 'teste' },
     logger,
     opcoes.monitoramento,
   )
   const hoje = opcoes.hoje ?? new Date('2026-11-04T12:00:00Z')
   const service = new SragService(repository, () => hoje)
+  const estado = new EstadoDados(repository, opcoes.semSincronizacao ? undefined : sync)
   const app = criarApp({
     config,
     logger,
     service,
-    sync,
+    estado,
+    sync: opcoes.semSincronizacao ? undefined : sync,
     monitoramento: opcoes.monitoramento,
     inicioProcesso: opcoes.inicioProcesso,
   })
   return {
     app,
     sync,
+    estado,
     repository,
     cache,
     fetchFn,

@@ -90,6 +90,22 @@ describe('mapearLinha', () => {
     expect(caso.municipioInternacao).toBeNull()
   })
 
+  it('entende os códigos gravados como decimal nos arquivos de 2019 e 2020', () => {
+    const caso = mapearLinha({ ...base, CLASSI_FIN: '5.0', EVOLUCAO: '2.0', PCR_SARS2: '1.0', UTI: '1', CS_SEXO: 'F' }, 2020)
+    expect(caso).toMatchObject({ classificacao: 'covid19', evolucao: 'obito', agentes: ['covid19'], uti: 'sim' })
+    expect(mapearLinha({ ...base, EVOLUCAO: '1.0', AN_SARS2: '1.0', CLASSI_FIN: '4.00' }, 2019)).toMatchObject({
+      evolucao: 'cura',
+      agentes: ['covid19'],
+      classificacao: 'nao_especificado',
+    })
+  })
+
+  it('não altera textos e datas ao normalizar decimais', () => {
+    const caso = mapearLinha({ ...base, ID_MN_RESI: 'LAGARTO', DT_NOTIFIC: '2020-05-01T00:00:00.000Z' }, 2020)
+    expect(caso.municipioResidencia.nome).toBe('LAGARTO')
+    expect(caso.dataNotificacao).toBe('2020-05-01')
+  })
+
   it('identifica tipos de influenza por RT-PCR e antígeno', () => {
     expect(mapearLinha({ ...base, POS_PCRFLU: '1', TP_FLU_PCR: '2' }, 2026).agentes).toEqual(['influenza_b'])
     expect(mapearLinha({ ...base, POS_AN_FLU: '1', TP_FLU_AN: '1' }, 2026).agentes).toEqual(['influenza_a'])

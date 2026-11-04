@@ -198,6 +198,33 @@ export function criarOpenApi(config: Config) {
           },
         },
       },
+      '/v1/srag/anos': {
+        get: {
+          tags: ['SRAG'],
+          summary: 'Comparativo por ano (pandemia vs. hoje)',
+          description:
+            'Uma linha por ano carregado, com totais e comparação com o ano anterior. Anos fechados são comparados pelo total; ' +
+            'o ano corrente (`parcial: true`) é comparado com as mesmas semanas epidemiológicas do ano anterior (`criterio: mesmo_periodo`).',
+          parameters: filtros.filter((f) => !['ano', 'semanaInicio', 'semanaFim', 'dataInicio', 'dataFim'].includes(f.name)),
+          responses: {
+            '200': {
+              description: 'Comparativo anual',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      dados: { type: 'array', items: { $ref: '#/components/schemas/ComparativoAno' } },
+                      aviso: { type: 'string' },
+                    },
+                  },
+                },
+              },
+            },
+            ...respostasErro,
+          },
+        },
+      },
       '/v1/srag/dicionario': {
         get: {
           tags: ['SRAG'],
@@ -245,7 +272,9 @@ export function criarOpenApi(config: Config) {
         post: {
           tags: ['Sistema'],
           summary: 'Dispara a sincronização com o OpenDataSUS',
-          description: 'Requer `ADMIN_TOKEN` configurado. Executa em segundo plano; acompanhe em `/v1/fonte`.',
+          description:
+            'Só no modo servidor e com `ADMIN_TOKEN` configurado. Executa em segundo plano; acompanhe em `/status`. ' +
+            'Na Vercel esta rota não existe: dispare o workflow "Sincronizar dados SRAG" no GitHub Actions.',
           security: [{ bearer: [] }],
           requestBody: {
             required: false,
@@ -324,6 +353,32 @@ export function criarOpenApi(config: Config) {
             porFaixaEtaria: contagem(FAIXA_ETARIA, ['nao_informada']),
             suporteVentilatorio: { type: 'object', additionalProperties: { type: 'integer' } },
             agentesIdentificados: contagem(AGENTE),
+          },
+        },
+        ComparativoAno: {
+          type: 'object',
+          properties: {
+            ano: { type: 'integer' },
+            parcial: { type: 'boolean' },
+            semanasNoPeriodo: { type: 'integer' },
+            totalCasos: { type: 'integer' },
+            mediaSemanal: { type: 'number' },
+            hospitalizados: { type: 'integer' },
+            internadosUti: { type: 'integer' },
+            obitosSrag: { type: 'integer' },
+            casosEmAberto: { type: 'integer' },
+            porClassificacao: contagem(CLASSIFICACAO),
+            agentesIdentificados: contagem(AGENTE),
+            comparacaoAnoAnterior: nullable({
+              type: 'object',
+              properties: {
+                criterio: { type: 'string', enum: ['ano_inteiro', 'mesmo_periodo'] },
+                semanas: { type: 'integer' },
+                casosAnoAnterior: { type: 'integer' },
+                casosNestePeriodo: { type: 'integer' },
+                variacaoPercentual: nullable({ type: 'number' }),
+              },
+            }),
           },
         },
         PontoSemanal: {

@@ -1,6 +1,6 @@
 import type { Config } from '../config/env'
 import type { StatusSincronizacao } from '../ingestion/sync.service'
-import type { FonteAno } from '../modules/srag/srag.repository'
+import type { ExecucaoSincronizacao, FonteAno } from '../modules/srag/srag.repository'
 import type { SnapshotMetricas } from './metricas'
 import type { Monitoramento } from './monitoramento'
 import type { Saude } from './saude'
@@ -8,9 +8,11 @@ import type { Saude } from './saude'
 export interface StatusApi {
   geradoEm: string
   municipio: Config['municipio']
+  armazenamento: 'mongodb' | 'memoria'
   saude: Saude
   dados: FonteAno[]
-  sincronizacao: StatusSincronizacao & { intervaloHoras: number }
+  sincronizacao: StatusSincronizacao & { intervaloHoras: number; nesteProcesso: boolean }
+  historico: ExecucaoSincronizacao[]
   integracoes: Monitoramento['integracoes']
   metricas: SnapshotMetricas
 }
@@ -55,6 +57,11 @@ function duracao(segundos: number): string {
 
 const ROTULO_SAUDE = { ok: 'Operacional', degradado: 'Degradado', indisponivel: 'Indisponível' } as const
 const ROTULO_SITUACAO = { atualizado: 'Atualizado', sem_alteracao: 'Sem alteração', erro: 'Erro' } as const
+const ROTULO_ORIGEM: Record<string, string> = {
+  servidor: 'Servidor',
+  cli: 'Linha de comando',
+  'github-actions': 'GitHub Actions',
+}
 
 function selo(texto: string, tipo: 'ok' | 'alerta' | 'erro' | 'neutro'): string {
   return `<span class="selo selo-${tipo}">${esc(texto)}</span>`
@@ -101,7 +108,29 @@ export function renderizarStatus(s: StatusApi): string {
           </tr>`,
         )
         .join('')
-    : '<tr><td colspan="4" class="vazio">Nenhuma sincronização executada desde que o servidor iniciou</td></tr>'
+    : '<tr><td colspan="4" class="vazio">Nenhuma sincronização registrada</td></tr>'
+
+  const linhasHistorico = s.historico.length
+    ? s.historico
+        .map((h) => {
+          const contagem = (situacao: string) => h.anos.filter((a) => a.situacao === situacao).length
+          return `<tr>
+            <td>${data(h.finalizadaEm)}</td>
+            <td>${esc(ROTULO_ORIGEM[h.origem] ?? h.origem)}</td>
+            <td>${selo(h.sucesso ? 'Sucesso' : 'Falhou', h.sucesso ? 'ok' : 'erro')}</td>
+            <td class="num">${numero(contagem('atualizado'))}</td>
+            <td class="num">${numero(contagem('sem_alteracao'))}</td>
+            <td class="num ${contagem('erro') ? 'texto-erro' : ''}">${numero(contagem('erro'))}</td>
+          </tr>`
+        })
+        .join('')
+    : '<tr><td colspan="6" class="vazio">Nenhuma sincronização registrada</td></tr>'
+
+  const proxima = !s.sincronizacao.nesteProcesso
+    ? 'Agendada fora da API'
+    : s.sincronizacao.intervaloHoras > 0
+      ? data(s.sincronizacao.proximaExecucao)
+      : 'Desativada'
 
   const linhasRotas = s.metricas.rotas.length
     ? s.metricas.rotas
@@ -223,11 +252,19 @@ footer { color: var(--suave); font-size: 13px; margin-top: 8px; }
       <div><span>Situação</span><span>${s.sincronizacao.emAndamento ? selo('Em andamento', 'alerta') : ultima ? selo(ultima.sucesso ? 'Concluída' : 'Falhou', ultima.sucesso ? 'ok' : 'erro') : selo('Aguardando', 'neutro')}</span></div>
       <div><span>Última execução</span><span>${data(ultima?.finalizadaEm)}</span></div>
       <div><span>Último sucesso</span><span>${data(s.sincronizacao.ultimoSucessoEm)}</span></div>
-      <div><span>Próxima verificação</span><span>${s.sincronizacao.intervaloHoras > 0 ? data(s.sincronizacao.proximaExecucao) : 'Desativada'}</span></div>
+      <div><span>Próxima verificação</span><span>${proxima}</span></div>
     </div>
     <div class="tabela"><table>
       <thead><tr><th class="num">Ano</th><th>Resultado</th><th>Arquivo</th><th>Detalhe</th></tr></thead>
       <tbody>${linhasSync}</tbody>
+    </table></div>
+  </section>
+
+  <section class="painel">
+    <h2>Histórico de sincronizações</h2>
+    <div class="tabela"><table>
+      <thead><tr><th>Finalizada em</th><th>Origem</th><th>Resultado</th><th class="num">Anos atualizados</th><th class="num">Sem alteração</th><th class="num">Com erro</th></tr></thead>
+      <tbody>${linhasHistorico}</tbody>
     </table></div>
   </section>
 
@@ -240,8 +277,9 @@ footer { color: var(--suave); font-size: 13px; margin-top: 8px; }
   </section>
 
   <section class="painel">
-    <h2>Monitoramento externo</h2>
+    <h2>Infraestrutura e monitoramento</h2>
     <div class="grade">
+      <div><span>Armazenamento</span><span>${selo(s.armazenamento === 'mongodb' ? 'MongoDB' : 'Memória + cache local', 'neutro')}</span></div>
       <div><span>Healthchecks.io</span><span>${integracao(s.integracoes.healthchecks)}</span></div>
       <div><span>Sentry</span><span>${integracao(s.integracoes.sentry)}</span></div>
     </div>

@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express'
 import { naoEncontrado } from '../../shared/errors'
 import { DICIONARIO } from './srag.codes'
-import { consultaCasosSchema, consultaResumoSchema, consultaSemanasSchema, idSchema } from './srag.schemas'
+import { consultaAnosSchema, consultaCasosSchema, consultaResumoSchema, consultaSemanasSchema, idSchema } from './srag.schemas'
 import type { SragService } from './srag.service'
 
 const AVISO_ATRASO =
@@ -41,6 +41,17 @@ export class SragController {
 
     const semanas = await this.service.serieSemanal(ano, consulta.filtro, consulta.janela)
     res.json({ dados: { ano, janelaMediaMovel: consulta.janela, semanas }, filtros: consulta.filtro, aviso: AVISO_ATRASO })
+  }
+
+  anos = async (req: Request, res: Response) => {
+    const filtro = consultaAnosSchema.parse(req.query)
+    res.json({
+      dados: await this.service.comparativoAnual(filtro),
+      filtros: filtro,
+      aviso:
+        'O ano corrente é parcial: ele é comparado com as mesmas semanas epidemiológicas do ano anterior (criterio "mesmo_periodo"). ' +
+        AVISO_ATRASO,
+    })
   }
 
   dicionario = (_req: Request, res: Response) => {

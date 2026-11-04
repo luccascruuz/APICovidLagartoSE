@@ -48,6 +48,32 @@ export interface PontoSemanal {
   mediaMovel: number | null
 }
 
+export interface ComparativoAno {
+  ano: number
+  parcial: boolean
+  semanasNoPeriodo: number
+  totalCasos: number
+  mediaSemanal: number
+  hospitalizados: number
+  internadosUti: number
+  obitosSrag: number
+  casosEmAberto: number
+  porClassificacao: Record<Classificacao, number>
+  agentesIdentificados: Record<Agente, number>
+  comparacaoAnoAnterior: {
+    criterio: 'ano_inteiro' | 'mesmo_periodo'
+    semanas: number
+    casosAnoAnterior: number
+    casosNestePeriodo: number
+    variacaoPercentual: number | null
+  } | null
+}
+
+function percentual(atual: number, anterior: number): number | null {
+  if (anterior === 0) return null
+  return Math.round(((atual - anterior) / anterior) * 1000) / 10
+}
+
 export class SragService {
   constructor(
     private readonly repository: SragRepository,
@@ -69,6 +95,52 @@ export class SragService {
   async resumo(filtro: FiltroCasos): Promise<Resumo> {
     const casos = await this.repository.listar(filtro)
     return resumir(casos)
+  }
+
+  async comparativoAnual(filtro: Omit<FiltroCasos, 'anos'>): Promise<ComparativoAno[]> {
+    const [fontes, casos] = await Promise.all([this.repository.fontes(), this.repository.listar(filtro)])
+    const atual = semanaEpidemiologica(this.hoje().toISOString().slice(0, 10))
+
+    const linhas: ComparativoAno[] = fontes.map(({ ano }) => {
+      const doAno = casos.filter((c) => c.ano === ano)
+      const resumo = resumir(doAno)
+      const parcial = ano >= atual.ano
+      const semanas = parcial ? Math.max(atual.semana, 1) : semanasNoAno(ano)
+      return {
+        ano,
+        parcial,
+        semanasNoPeriodo: semanas,
+        totalCasos: resumo.totalCasos,
+        mediaSemanal: Math.round((resumo.totalCasos / semanas) * 100) / 100,
+        hospitalizados: resumo.hospitalizados,
+        internadosUti: resumo.internadosUti,
+        obitosSrag: resumo.obitosSrag,
+        casosEmAberto: resumo.casosEmAberto,
+        porClassificacao: resumo.porClassificacao,
+        agentesIdentificados: resumo.agentesIdentificados,
+        comparacaoAnoAnterior: null,
+      }
+    })
+
+    const contarAteSemana = (ano: number, semana: number) =>
+      casos.filter((c) => c.ano === ano && c.semanaEpidemiologica <= semana).length
+
+    for (const linha of linhas) {
+      const anterior = linhas.find((l) => l.ano === linha.ano - 1)
+      if (!anterior) continue
+      const semanas = linha.parcial ? linha.semanasNoPeriodo : semanasNoAno(linha.ano)
+      const casosNestePeriodo = linha.parcial ? contarAteSemana(linha.ano, semanas) : linha.totalCasos
+      const casosAnoAnterior = linha.parcial ? contarAteSemana(anterior.ano, semanas) : anterior.totalCasos
+      linha.comparacaoAnoAnterior = {
+        criterio: linha.parcial ? 'mesmo_periodo' : 'ano_inteiro',
+        semanas,
+        casosAnoAnterior,
+        casosNestePeriodo,
+        variacaoPercentual: percentual(casosNestePeriodo, casosAnoAnterior),
+      }
+    }
+
+    return linhas
   }
 
   async serieSemanal(ano: number, filtro: FiltroCasos, janela: number): Promise<PontoSemanal[]> {

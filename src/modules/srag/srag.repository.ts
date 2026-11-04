@@ -33,12 +33,31 @@ export interface FonteAno {
   linhasDescartadas: number
 }
 
+export interface ResultadoAno {
+  ano: number
+  situacao: 'atualizado' | 'sem_alteracao' | 'erro'
+  arquivo?: string
+  totalCasos?: number
+  mensagem?: string
+}
+
+export interface ExecucaoSincronizacao {
+  origem: string
+  iniciadaEm: string
+  finalizadaEm: string
+  sucesso: boolean
+  anos: ResultadoAno[]
+}
+
 export interface SragRepository {
   salvarAno(fonte: FonteAno, casos: CasoSrag[]): Promise<void>
   buscar(filtro: FiltroCasos, paginacao: Paginacao): Promise<{ itens: CasoSrag[]; total: number }>
   listar(filtro: FiltroCasos): Promise<CasoSrag[]>
   buscarPorId(id: string): Promise<CasoSrag | null>
   fontes(): Promise<FonteAno[]>
+  registrarSincronizacao(execucao: ExecucaoSincronizacao): Promise<void>
+  sincronizacoes(limite: number): Promise<ExecucaoSincronizacao[]>
+  ultimoSucessoSincronizacao(): Promise<string | null>
 }
 
 export function correspondeAoFiltro(caso: CasoSrag, f: FiltroCasos): boolean {
@@ -57,16 +76,23 @@ export function correspondeAoFiltro(caso: CasoSrag, f: FiltroCasos): boolean {
   return true
 }
 
-function comparar(a: CasoSrag, b: CasoSrag): number {
-  return a.dataInicioSintomas.localeCompare(b.dataInicioSintomas) || a.id.localeCompare(b.id)
+export function compararCasos(a: CasoSrag, b: CasoSrag): number {
+  return a.ano - b.ano || a.dataInicioSintomas.localeCompare(b.dataInicioSintomas) || a.id.localeCompare(b.id)
 }
+
+export function removerDuplicados(casos: CasoSrag[]): CasoSrag[] {
+  return [...new Map(casos.map((c) => [c.id, c])).values()].sort(compararCasos)
+}
+
+const LIMITE_HISTORICO = 200
 
 export class InMemorySragRepository implements SragRepository {
   private readonly casosPorAno = new Map<number, CasoSrag[]>()
   private readonly fontesPorAno = new Map<number, FonteAno>()
+  private readonly historico: ExecucaoSincronizacao[] = []
 
   async salvarAno(fonte: FonteAno, casos: CasoSrag[]): Promise<void> {
-    const unicos = [...new Map(casos.map((c) => [c.id, c])).values()].sort(comparar)
+    const unicos = removerDuplicados(casos)
     this.casosPorAno.set(fonte.ano, unicos)
     this.fontesPorAno.set(fonte.ano, { ...fonte, totalCasos: unicos.length })
   }
@@ -87,8 +113,9 @@ export class InMemorySragRepository implements SragRepository {
   }
 
   async buscarPorId(id: string): Promise<CasoSrag | null> {
-    for (const casos of this.casosPorAno.values()) {
-      const caso = casos.find((c) => c.id === id)
+    const anos = [...this.casosPorAno.keys()].sort((a, b) => a - b)
+    for (const ano of anos) {
+      const caso = this.casosPorAno.get(ano)?.find((c) => c.id === id)
       if (caso) return caso
     }
     return null
@@ -96,5 +123,18 @@ export class InMemorySragRepository implements SragRepository {
 
   async fontes(): Promise<FonteAno[]> {
     return [...this.fontesPorAno.values()].sort((a, b) => a.ano - b.ano)
+  }
+
+  async registrarSincronizacao(execucao: ExecucaoSincronizacao): Promise<void> {
+    this.historico.unshift(structuredClone(execucao))
+    this.historico.splice(LIMITE_HISTORICO)
+  }
+
+  async sincronizacoes(limite: number): Promise<ExecucaoSincronizacao[]> {
+    return structuredClone(this.historico.slice(0, limite))
+  }
+
+  async ultimoSucessoSincronizacao(): Promise<string | null> {
+    return this.historico.find((e) => e.sucesso)?.finalizadaEm ?? null
   }
 }

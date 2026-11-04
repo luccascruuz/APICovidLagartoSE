@@ -1,0 +1,58 @@
+name: Sincronizar dados SRAG
+
+on:
+  schedule:
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+    inputs:
+      forcar:
+        description: Reimportar todos os anos, mesmo sem arquivo novo
+        type: boolean
+        default: false
+
+concurrency:
+  group: sincronizar-srag
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  sincronizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      NODE_ENV: production
+      LOG_LEVEL: info
+      ANOS: 2019-atual
+      MONGO_URI: ${{ secrets.MONGO_URI }}
+      MONGO_DB: ${{ vars.MONGO_DB || 'srag_lagarto' }}
+      HEALTHCHECKS_URL: ${{ secrets.HEALTHCHECKS_URL }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Conferir segredo
+        run: |
+          if [ -z "$MONGO_URI" ]; then
+            echo "::error::Cadastre o segredo MONGO_URI em Settings > Secrets and variables > Actions"
+            exit 1
+          fi
+
+      - name: Instalar dependências
+        run: npm ci --include=dev --ignore-scripts --no-audit --no-fund
+
+      - name: Sincronizar com o OpenDataSUS
+        run: npm run sync -- ${{ inputs.forcar && '--forcar' || '' }}
+
+      - name: Manter o agendamento ativo
+        if: always() && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method PUT "repos/${{ github.repository }}/actions/workflows/sincronizar.yml/enable" --silent

@@ -59,7 +59,6 @@ describe('Metricas', () => {
 describe('avaliarSaude', () => {
   const base = {
     dadosCarregados: true,
-    intervaloHoras: 12,
     maxHorasSemSync: 36,
     inicioProcesso: new Date('2026-11-01T00:00:00Z'),
     agora: new Date('2026-11-04T12:00:00Z'),
@@ -82,6 +81,7 @@ describe('avaliarSaude', () => {
       sincronizacao: statusSync({
         ultimoSucessoEm: '2026-11-04T00:00:00Z',
         ultimaExecucao: {
+          origem: 'teste',
           iniciadaEm: '2026-11-04T11:00:00Z',
           finalizadaEm: '2026-11-04T11:01:00Z',
           sucesso: false,
@@ -105,8 +105,8 @@ describe('avaliarSaude', () => {
     expect(avaliarSaude({ ...base, sincronizacao: statusSync() }).status).toBe('indisponivel')
   })
 
-  it('não cobra sincronização periódica quando ela está desativada', () => {
-    expect(avaliarSaude({ ...base, intervaloHoras: 0, sincronizacao: statusSync() }).status).toBe('ok')
+  it('não cobra prazo de sincronização quando SAUDE_MAX_HORAS_SEM_SYNC=0', () => {
+    expect(avaliarSaude({ ...base, maxHorasSemSync: 0, sincronizacao: statusSync() }).status).toBe('ok')
   })
 })
 

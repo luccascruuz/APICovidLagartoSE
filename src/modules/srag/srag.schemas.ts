@@ -85,6 +85,13 @@ export const consultaSemanasSchema = filtroBase
   })
   .transform(({ ano, janela, ...f }) => ({ ano, janela, filtro: paraFiltro(f) }))
 
+export const consultaAnosSchema = filtroBase
+  .omit({ ano: true, semanaInicio: true, semanaFim: true, dataInicio: true, dataFim: true })
+  .transform((f) => {
+    const { anos: _anos, ...filtro } = paraFiltro(f)
+    return filtro
+  })
+
 export const idSchema = z.object({ id: z.string().regex(/^\d{1,20}$/, 'id deve ser o número da notificação') })
 
 export const sincronizarSchema = z

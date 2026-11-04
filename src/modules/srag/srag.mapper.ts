@@ -34,8 +34,11 @@ export const COLUNAS_OBRIGATORIAS = ['NU_NOTIFIC', 'DT_SIN_PRI', 'CO_MUN_RES'] a
 
 export class LinhaInvalidaError extends Error {}
 
+const INTEIRO_COM_DECIMAL = /^(\d+)\.0+$/
+
 function texto(linha: LinhaSivep, coluna: string): string {
-  return (linha[coluna] ?? '').trim()
+  const valor = (linha[coluna] ?? '').trim()
+  return valor.replace(INTEIRO_COM_DECIMAL, '$1')
 }
 
 function codigo<T extends string>(mapa: Readonly<Record<string, string>>, valor: string): T | null {

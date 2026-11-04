@@ -9,6 +9,9 @@ import { renderizarStatus, type StatusApi } from '../../observability/status'
 import { AppError } from '../../shared/errors'
 import { sincronizarSchema } from '../srag/srag.schemas'
 import type { SragService } from '../srag/srag.service'
+import type { EstadoDados } from './estado-dados'
+
+const HISTORICO_NO_STATUS = 10
 
 function tokensIguais(recebido: string, esperado: string): boolean {
   const a = createHash('sha256').update(recebido).digest()
@@ -18,38 +21,52 @@ function tokensIguais(recebido: string, esperado: string): boolean {
 
 export interface SistemaDeps {
   config: Config
-  sync: SyncService
+  estado: EstadoDados
   service: SragService
   metricas: Metricas
   monitoramento: Monitoramento
   inicioProcesso: Date
+  sync?: SyncService
 }
 
 export function sistemaRoutes(deps: SistemaDeps): Router {
-  const { config, sync, service, metricas, monitoramento, inicioProcesso } = deps
+  const { config, estado, service, metricas, monitoramento, inicioProcesso, sync } = deps
   const router = Router()
 
-  const saude = () =>
+  const saude = async () =>
     avaliarSaude({
-      dadosCarregados: sync.pronto,
-      sincronizacao: sync.status,
-      intervaloHoras: config.syncIntervaloHoras,
+      dadosCarregados: await estado.pronto(),
+      sincronizacao: await estado.sincronizacao(),
       maxHorasSemSync: config.saudeMaxHorasSemSync,
       inicioProcesso,
     })
 
-  const status = async (): Promise<StatusApi> => ({
-    geradoEm: new Date().toISOString(),
-    municipio: config.municipio,
-    saude: saude(),
-    dados: await service.fontes(),
-    sincronizacao: { ...sync.status, intervaloHoras: config.syncIntervaloHoras },
-    integracoes: monitoramento.integracoes,
-    metricas: metricas.snapshot(),
-  })
+  const status = async (): Promise<StatusApi> => {
+    const [resultadoSaude, dados, sincronizacao, historico] = await Promise.all([
+      saude(),
+      service.fontes(),
+      estado.sincronizacao(),
+      estado.historico(HISTORICO_NO_STATUS),
+    ])
+    return {
+      geradoEm: new Date().toISOString(),
+      municipio: config.municipio,
+      armazenamento: config.mongoUri ? 'mongodb' : 'memoria',
+      saude: resultadoSaude,
+      dados,
+      sincronizacao: {
+        ...sincronizacao,
+        nesteProcesso: estado.sincronizaNesteProcesso,
+        intervaloHoras: estado.sincronizaNesteProcesso ? config.syncIntervaloHoras : 0,
+      },
+      historico,
+      integracoes: monitoramento.integracoes,
+      metricas: metricas.snapshot(),
+    }
+  }
 
-  router.get('/health', (_req, res) => {
-    const resultado = saude()
+  router.get('/health', async (_req, res) => {
+    const resultado = await saude()
     res.setHeader('Cache-Control', 'no-store')
     res.status(resultado.status === 'indisponivel' ? 503 : 200).json(resultado)
   })
@@ -74,15 +91,16 @@ export function sistemaRoutes(deps: SistemaDeps): Router {
           descricao:
             'Casos de Síndrome Respiratória Aguda Grave (SRAG) hospitalizados e óbitos por SRAG, filtrados pelo município de residência do paciente.',
         },
-        anosConfigurados: config.anos,
         anos: await service.fontes(),
-        sincronizacao: sync.status,
+        sincronizacao: await estado.sincronizacao(),
       },
     })
   })
 
   const exigirToken: RequestHandler = (req, _res, next) => {
-    if (!config.adminToken) return next(new AppError(404, 'ROTA_NAO_ENCONTRADA', 'Rota administrativa desativada'))
+    if (!config.adminToken || !sync) {
+      return next(new AppError(404, 'ROTA_NAO_ENCONTRADA', 'Rota administrativa desativada'))
+    }
     const [tipo, token] = (req.headers.authorization ?? '').split(' ')
     if (tipo !== 'Bearer' || !token || !tokensIguais(token, config.adminToken)) {
       return next(new AppError(401, 'NAO_AUTORIZADO', 'Token de administrador inválido ou ausente'))
@@ -92,11 +110,12 @@ export function sistemaRoutes(deps: SistemaDeps): Router {
 
   router.post('/v1/admin/sincronizar', exigirToken, (req, res) => {
     const { forcar } = sincronizarSchema.parse(req.body ?? {})
-    const jaEmAndamento = sync.emAndamento
-    void sync.sincronizar({ forcar }).catch(() => undefined)
+    const servico = sync!
+    const jaEmAndamento = servico.emAndamento
+    void servico.sincronizar({ forcar }).catch(() => undefined)
     res.status(202).json({
       mensagem: jaEmAndamento ? 'Já existe uma sincronização em andamento' : 'Sincronização iniciada',
-      status: sync.status,
+      status: servico.status,
     })
   })
 

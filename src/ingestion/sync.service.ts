@@ -1,27 +1,16 @@
 import { monitoramentoNulo, type Monitoramento } from '../observability/monitoramento'
 import type { Logger } from '../shared/logger'
-import type { FonteAno, SragRepository } from '../modules/srag/srag.repository'
+import type { ExecucaoSincronizacao, FonteAno, ResultadoAno, SragRepository } from '../modules/srag/srag.repository'
 import { filtrarMunicipio } from './csv-ingestor'
 import type { FileCache } from './file-cache'
 import type { OpenDataSusClient } from './opendatasus.client'
 
-export interface ResultadoAno {
-  ano: number
-  situacao: 'atualizado' | 'sem_alteracao' | 'erro'
-  arquivo?: string
-  totalCasos?: number
-  mensagem?: string
-}
+export type { ResultadoAno } from '../modules/srag/srag.repository'
 
 export interface StatusSincronizacao {
   emAndamento: boolean
   iniciadaEm: string | null
-  ultimaExecucao: {
-    iniciadaEm: string
-    finalizadaEm: string
-    sucesso: boolean
-    anos: ResultadoAno[]
-  } | null
+  ultimaExecucao: ExecucaoSincronizacao | null
   ultimoSucessoEm: string | null
   proximaExecucao: string | null
 }
@@ -30,12 +19,14 @@ export interface SyncOptions {
   anos: number[]
   municipioIbge: string
   intervaloHoras: number
+  origem: string
 }
+
+const LINHAS_POR_AVISO = 500_000
 
 export class SyncService {
   private execucaoAtual: Promise<ResultadoAno[]> | null = null
   private timer: NodeJS.Timeout | null = null
-  private carregouAlgumDado = false
   private readonly estado: StatusSincronizacao = {
     emAndamento: false,
     iniciadaEm: null,
@@ -47,7 +38,7 @@ export class SyncService {
   constructor(
     private readonly repository: SragRepository,
     private readonly client: OpenDataSusClient,
-    private readonly cache: FileCache,
+    private readonly cache: FileCache | null,
     private readonly opcoes: SyncOptions,
     private readonly logger: Logger,
     private readonly monitoramento: Monitoramento = monitoramentoNulo,
@@ -57,11 +48,8 @@ export class SyncService {
     return structuredClone(this.estado)
   }
 
-  get pronto(): boolean {
-    return this.carregouAlgumDado
-  }
-
   async carregarCache(): Promise<number> {
+    if (!this.cache) return 0
     let carregados = 0
     for (const ano of this.opcoes.anos) {
       try {
@@ -74,7 +62,6 @@ export class SyncService {
         this.logger.warn({ ano, err: erro }, 'Cache local ilegível, será refeito na próxima sincronização')
       }
     }
-    if (carregados > 0) this.carregouAlgumDado = true
     return carregados
   }
 
@@ -138,7 +125,9 @@ export class SyncService {
           const { casos, linhasLidas, linhasDescartadas } = await filtrarMunicipio(stream, {
             codigoIbge: this.opcoes.municipioIbge,
             anoArquivo: ano,
-            aoProgredir: (linhas) => this.logger.debug({ ano, linhas }, 'Lendo CSV'),
+            aoProgredir: (linhas) => {
+              if (linhas % LINHAS_POR_AVISO === 0) this.logger.info({ ano, linhas }, 'Lendo CSV nacional')
+            },
           })
 
           const fonte: FonteAno = {
@@ -152,8 +141,7 @@ export class SyncService {
             linhasDescartadas,
           }
           await this.repository.salvarAno(fonte, casos)
-          await this.cache.salvar(this.opcoes.municipioIbge, fonte, casos)
-          this.carregouAlgumDado = true
+          await this.cache?.salvar(this.opcoes.municipioIbge, fonte, casos)
 
           resultados.push({ ano, situacao: 'atualizado', arquivo: remoto.arquivo, totalCasos: casos.length })
           this.logger.info(
@@ -179,8 +167,15 @@ export class SyncService {
 
     const finalizadaEm = new Date().toISOString()
     const sucesso = resultados.every((r) => r.situacao !== 'erro')
-    this.estado.ultimaExecucao = { iniciadaEm, finalizadaEm, sucesso, anos: resultados }
+    const execucao: ExecucaoSincronizacao = { origem: this.opcoes.origem, iniciadaEm, finalizadaEm, sucesso, anos: resultados }
+    this.estado.ultimaExecucao = execucao
     if (sucesso) this.estado.ultimoSucessoEm = finalizadaEm
+    try {
+      await this.repository.registrarSincronizacao(execucao)
+    } catch (erro) {
+      this.logger.error({ err: erro }, 'Falha ao registrar a sincronização no banco')
+      this.monitoramento.erro(erro, { etapa: 'registrar_sincronizacao' })
+    }
     this.logger.info({ resultados }, 'Sincronização finalizada')
     this.monitoramento.sincronizacaoFinalizada(resultados)
     return resultados

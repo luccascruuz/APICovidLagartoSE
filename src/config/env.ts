@@ -2,9 +2,11 @@ import { z } from 'zod'
 
 z.config(z.locales.ptBR())
 
-try {
-  process.loadEnvFile()
-} catch {}
+if (process.env.VITEST !== 'true') {
+  try {
+    process.loadEnvFile()
+  } catch {}
+}
 
 const booleanString = z
   .enum(['true', 'false', '1', '0', ''])
@@ -15,10 +17,27 @@ function opcional<T extends z.ZodType>(schema: T) {
   return z.preprocess((v) => (v === '' ? undefined : v), schema.optional())
 }
 
+const trustProxy = z
+  .string()
+  .optional()
+  .transform((v, ctx): false | number | string => {
+    const valor = (v ?? '').trim()
+    if (!valor || valor === 'false') return false
+    if (valor === 'true') {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'TRUST_PROXY=true confia em qualquer origem e permite falsificar o IP. Use "loopback", um número de proxies ou uma lista de IPs.',
+      })
+      return z.NEVER
+    }
+    if (/^\d+$/.test(valor)) return Number(valor)
+    return valor
+  })
+
 const anoAtual = new Date().getUTCFullYear()
 
 export function parseAnos(valor: string | undefined, referencia = anoAtual): number[] {
-  const texto = (valor ?? '').trim()
+  const texto = (valor ?? '').trim().toLowerCase().replace(/\batual\b/g, String(referencia))
   if (!texto) return [referencia - 1, referencia]
 
   const anos = new Set<number>()
@@ -47,6 +66,8 @@ export function parseAnos(valor: string | undefined, referencia = anoAtual): num
 const schema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().int().min(1).max(65535).default(3333),
+  HOST: opcional(z.string().min(1)),
+  TRUST_PROXY: trustProxy,
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
 
   MUNICIPIO_IBGE: z
@@ -70,7 +91,15 @@ const schema = z.object({
   CORS_ORIGIN: z.string().default('*'),
   RATE_LIMIT_POR_MINUTO: z.coerce.number().int().min(0).default(120),
 
-  SAUDE_MAX_HORAS_SEM_SYNC: z.coerce.number().min(1).default(36),
+  MONGO_URI: opcional(
+    z
+      .string()
+      .regex(/^mongodb(\+srv)?:\/\//, 'MONGO_URI deve começar com mongodb:// ou mongodb+srv://'),
+  ),
+  MONGO_DB: z.string().regex(/^[A-Za-z0-9_-]{1,38}$/, 'Nome de banco inválido').default('srag_lagarto'),
+  MONGO_CACHE_SEGUNDOS: z.coerce.number().int().min(0).default(60),
+
+  SAUDE_MAX_HORAS_SEM_SYNC: z.coerce.number().min(0).default(36),
   HEALTHCHECKS_URL: opcional(z.url({ protocol: /^https?$/ })),
   SENTRY_DSN: opcional(z.url()),
 })
@@ -85,6 +114,8 @@ function carregar() {
   return {
     nodeEnv: env.NODE_ENV,
     port: env.PORT,
+    host: env.HOST,
+    trustProxy: env.TRUST_PROXY,
     logLevel: env.NODE_ENV === 'test' ? 'silent' : env.LOG_LEVEL,
     municipio: {
       codigoIbge: env.MUNICIPIO_IBGE,
@@ -99,6 +130,9 @@ function carregar() {
     adminToken: env.ADMIN_TOKEN,
     corsOrigin: env.CORS_ORIGIN === '*' ? '*' : env.CORS_ORIGIN.split(',').map((o) => o.trim()),
     rateLimitPorMinuto: env.RATE_LIMIT_POR_MINUTO,
+    mongoUri: env.MONGO_URI,
+    mongoDb: env.MONGO_DB,
+    mongoCacheSegundos: env.MONGO_CACHE_SEGUNDOS,
     saudeMaxHorasSemSync: env.SAUDE_MAX_HORAS_SEM_SYNC,
     healthchecksUrl: env.HEALTHCHECKS_URL?.replace(/\/+$/, ''),
     sentryDsn: env.SENTRY_DSN,

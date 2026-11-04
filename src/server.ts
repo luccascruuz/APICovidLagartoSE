@@ -2,16 +2,20 @@ import { criarApp } from './app'
 import { criarContainer } from './container'
 
 async function main() {
-  const deps = criarContainer()
-  const { config, logger, sync, monitoramento } = deps
+  const deps = criarContainer({ origem: 'servidor', comSincronizacao: true })
+  const { config, logger, monitoramento } = deps
+  const sync = deps.sync!
 
   const carregados = await sync.carregarCache()
-  logger.info({ anos: config.anos, anosEmCache: carregados }, 'Dados locais carregados')
+  logger.info({ armazenamento: deps.armazenamento, anos: config.anos, anosEmCache: carregados }, 'Iniciando')
 
   const app = criarApp(deps)
-  const server = app.listen(config.port, () => {
-    logger.info(`API SRAG ${config.municipio.nome}-${config.municipio.uf} em http://localhost:${config.port} (docs em /docs)`)
-  })
+  const aoIniciar = () => {
+    logger.info(
+      `API SRAG ${config.municipio.nome}-${config.municipio.uf} em http://${config.host ?? 'localhost'}:${config.port} (docs em /docs)`,
+    )
+  }
+  const server = config.host ? app.listen(config.port, config.host, aoIniciar) : app.listen(config.port, aoIniciar)
 
   if (config.syncAoIniciar) {
     sync.sincronizar().catch((erro) => logger.error({ err: erro }, 'Falha na sincronização inicial'))
@@ -20,9 +24,8 @@ async function main() {
 
   const encerrar = (sinal: string) => {
     logger.info({ sinal }, 'Encerrando servidor')
-    sync.parar()
     server.close(() => {
-      void monitoramento.encerrar().finally(() => process.exit(0))
+      void deps.encerrar().finally(() => process.exit(0))
     })
     setTimeout(() => process.exit(0), 10_000).unref()
   }
