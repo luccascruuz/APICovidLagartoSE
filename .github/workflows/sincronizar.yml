@@ -2,7 +2,8 @@ name: Sincronizar dados SRAG
 
 on:
   schedule:
-    - cron: '0 9 * * *'
+    - cron: '23 9 * * *'
+    - cron: '23 21 * * *'
   workflow_dispatch:
     inputs:
       forcar:

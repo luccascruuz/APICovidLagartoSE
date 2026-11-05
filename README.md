@@ -205,7 +205,7 @@ Em **Settings → Secrets and variables → Actions** do repositório:
 | Variable | `MONGO_DB` | (opcional) nome do banco, se não for `srag_lagarto` |
 
 O workflow [.github/workflows/sincronizar.yml](.github/workflows/sincronizar.yml):
-- **Roda todo dia às 06:00 (horário de Brasília).** Para mudar para semanal, troque o `cron` por `'0 9 * * 1'`.
+- **Roda duas vezes por dia, às 06:23 e às 18:23 (horário de Brasília).** O GitHub pode atrasar ou descartar execuções agendadas em horários de pico, principalmente na virada da hora; por isso os minutos "quebrados" e as duas execuções. Para semanal, deixe só uma linha com `'23 9 * * 1'` e ajuste `SAUDE_MAX_HORAS_SEM_SYNC=192`.
 - **Pode ser disparado à mão** em **Actions → Sincronizar dados SRAG → Run workflow**, com a opção de reimportar tudo.
 - **Mantém o próprio agendamento ativo.** O GitHub desativa agendamentos de repositórios públicos após 60 dias sem commits, e o último passo do job reativa o workflow pela API a cada execução.
 
